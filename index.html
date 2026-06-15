@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>단골집 주문</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f5f5; }
+    .app { max-width: 480px; margin: 0 auto; background: #fff; min-height: 100vh; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* 공통 */
+    .topbar { display: flex; align-items: center; gap: 10px; padding: 16px; border-bottom: 1px solid #eee; background: #fff; }
+    .topbar-title { font-size: 18px; font-weight: 600; flex: 1; }
+    .back-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: #555; padding: 4px; }
+    .icon-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: #555; padding: 4px; }
+
+    /* 로그인 */
+    .login-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 40px; gap: 24px; }
+    .login-title { font-size: 26px; font-weight: 700; text-align: center; }
+    .login-sub { font-size: 15px; color: #777; text-align: center; line-height: 1.6; }
+    .google-btn { display: flex; align-items: center; gap: 12px; padding: 14px 28px; border: 1px solid #ddd; border-radius: 12px; background: #fff; font-size: 16px; font-weight: 500; cursor: pointer; width: 100%; justify-content: center; }
+    .google-btn:active { background: #f5f5f5; }
+
+    /* 홈(관리자) */
+    .store-list { padding: 12px; }
+    .store-card { background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 16px; margin-bottom: 10px; }
+    .store-name { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+    .store-meta { font-size: 14px; color: #888; margin-bottom: 6px; }
+    .store-menus { font-size: 13px; color: #aaa; margin-bottom: 12px; }
+    .store-actions { display: flex; gap: 8px; }
+    .btn-sm { font-size: 13px; padding: 7px 14px; border-radius: 8px; border: 1px solid #ddd; background: none; cursor: pointer; color: #555; }
+    .btn-sm.danger { color: #c0392b; border-color: #f5c6c6; }
+    .add-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 24px); margin: 4px 12px; padding: 16px; border: 1.5px dashed #ccc; border-radius: 14px; background: none; cursor: pointer; font-size: 16px; color: #888; }
+
+    /* 공유 패널 */
+    .share-panel { margin: 8px 12px; padding: 16px; background: #f0f7ff; border-radius: 14px; border: 1px solid #c8e0ff; }
+    .share-label { font-size: 13px; color: #555; margin-bottom: 8px; font-weight: 500; }
+    .share-url { font-size: 12px; color: #888; word-break: break-all; line-height: 1.5; margin-bottom: 10px; padding: 8px; background: #fff; border-radius: 8px; border: 1px solid #ddd; }
+    .share-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .copy-btn { padding: 10px; font-size: 14px; border-radius: 8px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
+    .kakao-btn { padding: 10px; font-size: 14px; font-weight: 600; border-radius: 8px; border: none; background: #FEE500; color: #3C1E1E; cursor: pointer; }
+
+    /* 가게 등록/수정 폼 */
+    .form-section { padding: 16px; }
+    .field-group { margin-bottom: 18px; }
+    .field-label { font-size: 14px; color: #555; margin-bottom: 6px; display: block; font-weight: 500; }
+    input[type=text], input[type=tel] { width: 100%; font-size: 16px; padding: 13px 14px; border-radius: 10px; border: 1px solid #ddd; outline: none; }
+    input:focus { border-color: #185FA5; }
+    .menu-chip-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+    .menu-chip { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f0f4ff; border: 1px solid #c5d5f5; border-radius: 20px; font-size: 14px; }
+    .menu-chip .del { background: none; border: none; cursor: pointer; font-size: 16px; color: #999; padding: 0; line-height: 1; }
+    .menu-input-row { display: flex; gap: 8px; }
+    .menu-input-row input { flex: 1; font-size: 15px; padding: 11px 13px; border-radius: 10px; border: 1px solid #ddd; }
+    .add-menu-btn { width: 44px; height: 44px; border-radius: 10px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; color: #185FA5; flex-shrink: 0; }
+    .save-btn { display: block; width: 100%; padding: 18px; font-size: 17px; font-weight: 600; border-radius: 12px; border: none; background: #185FA5; color: #fff; cursor: pointer; margin-top: 8px; }
+    .save-btn:active { opacity: 0.85; }
+
+    /* 부모님 홈 */
+    .parent-list { padding: 16px; }
+    .parent-store-card { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 22px 18px; margin-bottom: 12px; cursor: pointer; text-align: center; }
+    .parent-store-card:active { background: #f0f7ff; }
+    .parent-store-name { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+    .parent-store-meta { font-size: 15px; color: #999; }
+
+    /* 메뉴 선택 */
+    .menu-order-list { padding: 12px; }
+    .menu-item { display: flex; align-items: center; gap: 14px; padding: 18px 16px; background: #fff; border: 1px solid #eee; border-radius: 14px; margin-bottom: 10px; cursor: pointer; }
+    .menu-item.selected { border-color: #185FA5; background: #f0f7ff; }
+    .menu-check { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #ddd; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 17px; }
+    .menu-item.selected .menu-check { background: #185FA5; border-color: #185FA5; color: #fff; }
+    .menu-item-name { font-size: 20px; font-weight: 500; }
+
+    /* 주문 바 */
+    .order-bar { margin: 12px; padding: 16px; background: #f5f5f5; border-radius: 14px; }
+    .order-summary { font-size: 15px; color: #333; margin-bottom: 14px; min-height: 22px; }
+    .call-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 22px; font-size: 20px; font-weight: 700; border-radius: 14px; border: none; background: #185FA5; color: #fff; cursor: pointer; }
+    .call-btn:disabled { background: #ddd; color: #aaa; cursor: default; }
+
+    /* 유틸 */
+    .empty-hint { text-align: center; padding: 60px 24px; color: #aaa; font-size: 15px; line-height: 1.8; }
+    .logout-btn { font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1px solid #eee; background: none; cursor: pointer; color: #aaa; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- 로그인 화면 -->
+  <div id="screen-login" class="screen active">
+    <div class="login-wrap">
+      <div style="font-size: 48px;">🍜</div>
+      <div class="login-title">단골집 주문</div>
+      <div class="login-sub">부모님이 쉽게 전화 주문할 수 있도록<br>가게와 메뉴를 등록해드리세요</div>
+      <button class="google-btn" onclick="loginWithGoogle()">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.5 30.2 0 24 0 14.6 0 6.6 5.6 2.7 13.7l7.8 6C12.4 13.1 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.9 7.2l7.6 5.9C43.7 37.5 46.5 31.4 46.5 24.5z"/><path fill="#FBBC05" d="M10.5 28.5c-.6-1.6-.9-3.2-.9-5s.3-3.4.9-5l-7.8-6C1 15.6 0 19.7 0 24s1 8.4 2.7 11.5l7.8-6z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.6-5.9c-2.1 1.4-4.7 2.2-7.6 2.2-6.2 0-11.5-3.7-13.5-9l-7.8 6C6.6 42.4 14.6 48 24 48z"/></svg>
+        Google로 시작하기
+      </button>
+    </div>
+  </div>
+
+  <!-- 관리자 홈 -->
+  <div id="screen-home" class="screen">
+    <div class="topbar">
+      <span class="topbar-title">🍜 단골집 주문</span>
+      <button class="logout-btn" onclick="logout()">로그아웃</button>
+      <button class="icon-btn" onclick="showEdit(null)" aria-label="가게 추가">＋</button>
+    </div>
+    <div class="store-list" id="store-list"></div>
+    <button class="add-btn" onclick="showEdit(null)">＋ 가게 추가하기</button>
+    <div style="padding: 0 12px; margin-top: 8px;" id="share-section">
+      <div class="share-panel">
+        <div class="share-label">📤 부모님께 공유할 링크</div>
+        <div class="share-url" id="share-url-text">가게를 추가하면 링크가 생성됩니다</div>
+        <div class="share-btns">
+          <button class="copy-btn" onclick="copyLink()">링크 복사</button>
+          <button class="kakao-btn" onclick="shareLink()">카톡으로 보내기</button>
+        </div>
+      </div>
+    </div>
+    <div style="height: 24px;"></div>
+  </div>
+
+  <!-- 가게 등록/수정 -->
+  <div id="screen-edit" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="showHome()" aria-label="뒤로">←</button>
+      <span class="topbar-title" id="edit-title">가게 등록</span>
+    </div>
+    <div class="form-section">
+      <div class="field-group">
+        <label class="field-label">가게 이름</label>
+        <input type="text" id="f-name" placeholder="예) 단골 짜장면집">
+      </div>
+      <div class="field-group">
+        <label class="field-label">전화번호</label>
+        <input type="tel" id="f-phone" placeholder="예) 02-1234-5678">
+      </div>
+      <div class="field-group">
+        <label class="field-label">자주 시키는 메뉴</label>
+        <div id="menu-chips" class="menu-chip-list"></div>
+        <div class="menu-input-row">
+          <input type="text" id="f-menu" placeholder="메뉴 입력 후 + 버튼" onkeydown="if(event.key==='Enter')addMenu()">
+          <button class="add-menu-btn" onclick="addMenu()" aria-label="메뉴 추가">＋</button>
+        </div>
+      </div>
+      <button class="save-btn" onclick="saveStore()">저장하기</button>
+    </div>
+  </div>
+
+  <!-- 부모님 홈 -->
+  <div id="screen-parent" class="screen">
+    <div class="topbar">
+      <span class="topbar-title">🍜 어디 시킬까요?</span>
+    </div>
+    <div class="parent-list" id="parent-list"></div>
+  </div>
+
+  <!-- 메뉴 선택 -->
+  <div id="screen-order" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="showParent()" aria-label="뒤로">←</button>
+      <span class="topbar-title" id="order-store-name"></span>
+    </div>
+    <div class="menu-order-list" id="menu-order-list"></div>
+    <div class="order-bar">
+      <div class="order-summary" id="order-summary">메뉴를 골라주세요</div>
+      <button class="call-btn" id="call-btn" onclick="doCall()" disabled>📞 전화 주문하기</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  // ✅ 개발용 스위치: true면 Firebase 없이 로컬(목 로그인 + localStorage)에서 동작.
+  //    실제 배포 전에는 false로 바꾸고 아래 firebaseConfig를 채워주세요.
+  const DEV_MODE = false;
+
+  // ✅ 여기에 Firebase 설정값 붙여넣기 (DEV_MODE = false 일 때 사용)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCTxiOLyneie95HgVu1KOCpbQU6Su-KwSc",
+    authDomain: "parents-order.firebaseapp.com",
+    databaseURL: "https://parents-order-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "parents-order",
+    storageBucket: "parents-order.firebasestorage.app",
+    messagingSenderId: "752416834409",
+    appId: "1:752416834409:web:724148d1971827c7e073f8",
+    measurementId: "G-VCR1MJZ5YM"
+  };
+
+  // Firebase / 목 구현이 채워질 핸들 (모듈 스코프에서 재할당하기 위해 let 사용)
+  let auth, db;
+  let ref, set, get, onValue, remove;
+  let GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged;
+
+  if (DEV_MODE) {
+    setupMockBackend();
+  } else {
+    const appMod  = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const authMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+    const dbMod   = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
+    ({ GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } = authMod);
+    ({ ref, set, get, onValue, remove } = dbMod);
+    const app = appMod.initializeApp(firebaseConfig);
+    auth = authMod.getAuth(app);
+    db = dbMod.getDatabase(app);
+  }
+
+  // ──────────────────────────────
+  // 목 백엔드 (개발 전용) — localStorage 기반 가짜 RTDB + 가짜 Google 로그인
+  // ──────────────────────────────
+  function setupMockBackend() {
+    const DB_KEY = 'parents-order-mock-db';
+    const AUTH_KEY = 'parents-order-mock-auth';
+    const MOCK_USER = { uid: 'dev-user-001', displayName: '개발자' };
+
+    const load = () => { try { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; } catch { return {}; } };
+    const save = (data) => localStorage.setItem(DB_KEY, JSON.stringify(data));
+    const parts = (path) => path.split('/').filter(Boolean);
+    const getPath = (obj, path) => parts(path).reduce((cur, p) => (cur == null ? undefined : cur[p]), obj);
+    const setPath = (obj, path, value) => {
+      const ps = parts(path); let cur = obj;
+      for (let i = 0; i < ps.length - 1; i++) {
+        if (typeof cur[ps[i]] !== 'object' || cur[ps[i]] == null) cur[ps[i]] = {};
+        cur = cur[ps[i]];
+      }
+      cur[ps[ps.length - 1]] = value;
+    };
+    const removePath = (obj, path) => {
+      const ps = parts(path); let cur = obj;
+      for (let i = 0; i < ps.length - 1; i++) { if (cur[ps[i]] == null) return; cur = cur[ps[i]]; }
+      delete cur[ps[ps.length - 1]];
+    };
+    const snapshot = (val) => ({ exists: () => val !== undefined && val !== null, val: () => val });
+
+    const listeners = [];
+    const notify = (changedPath) => {
+      const data = load();
+      listeners.forEach(({ path, cb }) => {
+        if (changedPath === path || changedPath.startsWith(path + '/') || path.startsWith(changedPath + '/')) {
+          cb(snapshot(getPath(data, path)));
+        }
+      });
+    };
+
+    // 첫 실행 시 샘플 가게 한 곳 자동 등록 (개발 편의용)
+    const seed = load();
+    if (!getPath(seed, `families/${MOCK_USER.uid}/stores`)) {
+      setPath(seed, `families/${MOCK_USER.uid}/owner`, MOCK_USER.uid);
+      setPath(seed, `families/${MOCK_USER.uid}/stores/sample1`, {
+        name: '단골 짜장면집', phone: '02-1234-5678',
+        menus: ['짜장면', '짬뽕', '탕수육']
+      });
+      save(seed);
+    }
+
+    ref = (_db, path) => ({ _path: path });
+    get = async (r) => snapshot(getPath(load(), r._path));
+    set = async (r, value) => { const d = load(); setPath(d, r._path, value); save(d); notify(r._path); };
+    remove = async (r) => { const d = load(); removePath(d, r._path); save(d); notify(r._path); };
+    onValue = (r, cb) => {
+      const entry = { path: r._path, cb };
+      listeners.push(entry);
+      cb(snapshot(getPath(load(), r._path)));
+      return () => { const i = listeners.indexOf(entry); if (i >= 0) listeners.splice(i, 1); };
+    };
+
+    let authCb = null;
+    GoogleAuthProvider = function () {};
+    onAuthStateChanged = (_auth, cb) => {
+      authCb = cb;
+      cb(localStorage.getItem(AUTH_KEY) === '1' ? MOCK_USER : null);
+    };
+    signInWithPopup = async () => { localStorage.setItem(AUTH_KEY, '1'); if (authCb) authCb(MOCK_USER); };
+    signOut = async () => { localStorage.removeItem(AUTH_KEY); if (authCb) authCb(null); };
+    auth = {}; db = {};
+
+    // 화면 우상단에 개발 모드 배지 표시
+    const badge = document.createElement('div');
+    badge.textContent = 'DEV';
+    badge.style.cssText = 'position:fixed;top:8px;right:8px;z-index:9999;background:#c0392b;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;font-family:sans-serif;';
+    document.body.appendChild(badge);
+    console.log('[DEV_MODE] Firebase 없이 로컬 목 백엔드로 동작 중입니다. (localStorage)');
+  }
+
+  let familyId = null;
+  let editMenus = [];
+  let editingStoreKey = null;
+  let currentStoreData = null;
+  let selectedMenus = [];
+  let parentStores = {};
+  let unsubscribeStores = null;
+
+  // ──────────────────────────────
+  // 화면 전환
+  // ──────────────────────────────
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ──────────────────────────────
+  // 유틸
+  // ──────────────────────────────
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  window.showHome = () => { showScreen('screen-home'); loadStores(); };
+  window.showEdit = (storeKey) => {
+    editingStoreKey = storeKey;
+    document.getElementById('edit-title').textContent = storeKey ? '가게 수정' : '가게 등록';
+    if (storeKey) {
+      get(ref(db, `families/${familyId}/stores/${storeKey}`)).then(snap => {
+        const s = snap.val();
+        document.getElementById('f-name').value = s.name;
+        document.getElementById('f-phone').value = s.phone;
+        editMenus = s.menus || [];
+        renderMenuChips();
+      });
+    } else {
+      document.getElementById('f-name').value = '';
+      document.getElementById('f-phone').value = '';
+      editMenus = [];
+      renderMenuChips();
+    }
+    showScreen('screen-edit');
+  };
+  window.showParent = () => { showScreen('screen-parent'); };
+
+  // ──────────────────────────────
+  // 인증
+  // ──────────────────────────────
+  window.loginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  };
+
+  window.logout = async () => {
+    if (unsubscribeStores) { unsubscribeStores(); unsubscribeStores = null; }
+    await signOut(auth);
+    showScreen('screen-login');
+  };
+
+  onAuthStateChanged(auth, async user => {
+    // 부모님 모드: URL에 ?fid=xxx 있으면 로그인 없이 바로 주문 화면
+    const params = new URLSearchParams(location.search);
+    const fid = params.get('fid');
+    if (fid) {
+      familyId = fid;
+      await loadParentStores();
+      showScreen('screen-parent');
+      return;
+    }
+
+    if (user) {
+      familyId = user.uid;
+      // 최초 가입 시 families/{uid} 초기화
+      const snap = await get(ref(db, `families/${familyId}`));
+      if (!snap.exists()) {
+        await set(ref(db, `families/${familyId}/owner`), user.uid);
+      }
+      showHome();
+    } else {
+      showScreen('screen-login');
+    }
+  });
+
+  // ──────────────────────────────
+  // 가게 로드 (관리자)
+  // ──────────────────────────────
+  function loadStores() {
+    if (unsubscribeStores) { unsubscribeStores(); unsubscribeStores = null; }
+    unsubscribeStores = onValue(ref(db, `families/${familyId}/stores`), snap => {
+      const el = document.getElementById('store-list');
+      if (!snap.exists()) {
+        el.innerHTML = '<div class="empty-hint">🏪<br>등록된 가게가 없어요.<br>아래 버튼으로 추가해보세요!</div>';
+        document.getElementById('share-url-text').textContent = '가게를 추가하면 링크가 생성됩니다';
+        return;
+      }
+      const stores = snap.val();
+      el.innerHTML = Object.entries(stores).map(([key, s]) => `
+        <div class="store-card">
+          <div class="store-name">${escapeHtml(s.name)}</div>
+          <div class="store-meta">${escapeHtml(s.phone)}</div>
+          <div class="store-menus">${escapeHtml((s.menus || []).join(', ') || '메뉴 없음')}</div>
+          <div class="store-actions">
+            <button class="btn-sm" onclick="showEdit('${key}')">✏️ 수정</button>
+            <button class="btn-sm danger" onclick="deleteStore('${key}')">🗑 삭제</button>
+          </div>
+        </div>
+      `).join('');
+
+      // 공유 링크 갱신
+      const base = location.href.split('?')[0];
+      document.getElementById('share-url-text').textContent = `${base}?fid=${familyId}`;
+    }, { onlyOnce: false });
+  }
+
+  // ──────────────────────────────
+  // 가게 저장
+  // ──────────────────────────────
+  window.saveStore = async () => {
+    addMenu(); // 입력칸에 남아있는 메뉴 텍스트가 있으면 먼저 칩으로 추가
+    const name = document.getElementById('f-name').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    if (!name || !phone) { alert('가게 이름과 전화번호를 입력해주세요'); return; }
+    const key = editingStoreKey || Date.now().toString();
+    await set(ref(db, `families/${familyId}/stores/${key}`), { name, phone, menus: [...editMenus] });
+    showHome();
+  };
+
+  window.deleteStore = async (key) => {
+    if (!confirm('이 가게를 삭제할까요?')) return;
+    await remove(ref(db, `families/${familyId}/stores/${key}`));
+  };
+
+  // ──────────────────────────────
+  // 메뉴 칩
+  // ──────────────────────────────
+  window.addMenu = () => {
+    const inp = document.getElementById('f-menu');
+    const v = inp.value.trim();
+    if (!v) return;
+    editMenus.push(v);
+    inp.value = '';
+    renderMenuChips();
+    inp.focus();
+  };
+  window.removeMenu = (i) => { editMenus.splice(i, 1); renderMenuChips(); };
+
+  function renderMenuChips() {
+    document.getElementById('menu-chips').innerHTML = editMenus.map((m, i) =>
+      `<span class="menu-chip">${escapeHtml(m)}<button class="del" onclick="removeMenu(${i})">×</button></span>`
+    ).join('');
+  }
+
+  // ──────────────────────────────
+  // 공유 링크
+  // ──────────────────────────────
+  window.copyLink = () => {
+    const url = `${location.href.split('?')[0]}?fid=${familyId}`;
+    navigator.clipboard.writeText(url)
+      .then(() => alert('링크 복사 완료!\n카톡으로 부모님께 보내주세요.'))
+      .catch(() => prompt('아래 링크를 복사하세요:', url));
+  };
+  window.shareLink = () => {
+    const url = `${location.href.split('?')[0]}?fid=${familyId}`;
+    if (navigator.share) {
+      navigator.share({ title: '부모님 단골집 주문', url });
+    } else {
+      prompt('카카오톡에 붙여넣기 해서 보내세요:', url);
+    }
+  };
+
+  // ──────────────────────────────
+  // 부모님 화면
+  // ──────────────────────────────
+  async function loadParentStores() {
+    const snap = await get(ref(db, `families/${familyId}/stores`));
+    const el = document.getElementById('parent-list');
+    if (!snap.exists()) {
+      el.innerHTML = '<div class="empty-hint">등록된 가게가 없어요.<br>자녀에게 등록 요청해보세요.</div>';
+      return;
+    }
+    parentStores = snap.val();
+    el.innerHTML = Object.entries(parentStores).map(([key, s]) => `
+      <div class="parent-store-card" onclick="showOrder('${key}')">
+        <div class="parent-store-name">${escapeHtml(s.name)}</div>
+        <div class="parent-store-meta">메뉴 ${(s.menus || []).length}개</div>
+      </div>
+    `).join('');
+  }
+
+  window.showOrder = (key) => {
+    currentStoreData = parentStores[key];
+    selectedMenus = [];
+    document.getElementById('order-store-name').textContent = currentStoreData.name;
+    const menus = currentStoreData.menus || [];
+    const el = document.getElementById('menu-order-list');
+    el.innerHTML = menus.length
+      ? menus.map((m, i) => `
+          <div class="menu-item" id="mi-${i}" onclick="toggleMenu(${i})">
+            <div class="menu-check" id="mc-${i}"></div>
+            <span class="menu-item-name">${escapeHtml(m)}</span>
+          </div>
+        `).join('')
+      : '<div class="empty-hint">등록된 메뉴가 없어요.</div>';
+    updateOrderBar();
+    showScreen('screen-order');
+  };
+
+  window.toggleMenu = (i) => {
+    const name = currentStoreData.menus[i];
+    const item = document.getElementById('mi-' + i);
+    const chk = document.getElementById('mc-' + i);
+    const idx = selectedMenus.indexOf(name);
+    if (idx === -1) {
+      selectedMenus.push(name);
+      item.classList.add('selected');
+      chk.textContent = '✓';
+    } else {
+      selectedMenus.splice(idx, 1);
+      item.classList.remove('selected');
+      chk.textContent = '';
+    }
+    updateOrderBar();
+  };
+
+  function updateOrderBar() {
+    const btn = document.getElementById('call-btn');
+    const sum = document.getElementById('order-summary');
+    if (!selectedMenus.length) {
+      sum.textContent = '메뉴를 골라주세요';
+      btn.disabled = true;
+    } else {
+      sum.textContent = selectedMenus.join(', ');
+      btn.disabled = false;
+    }
+  }
+
+  window.doCall = () => {
+    if (confirm(`${currentStoreData.name}에 전화할까요?\n\n주문: ${selectedMenus.join(', ')}`)) {
+      location.href = 'tel:' + currentStoreData.phone.replace(/[^0-9+]/g, '');
+    }
+  };
+</script>
+</body>
+</html>
