@@ -430,8 +430,9 @@
       .catch(() => prompt('아래 주소를 복사하세요:', location.href));
   };
 
-  // 인앱 브라우저에서는 구글 로그인 버튼 대신 안내 문구 표시
-  if (isInAppBrowser()) {
+  // 인앱 브라우저에서는 구글 로그인 버튼 대신 안내 문구 표시 (부모님 모드는 로그인이 필요 없으므로 제외)
+  const isParentMode = new URLSearchParams(location.search).has('fid');
+  if (!isParentMode && isInAppBrowser()) {
     document.getElementById('google-login-btn').style.display = 'none';
     document.getElementById('inapp-notice').style.display = 'block';
   }
