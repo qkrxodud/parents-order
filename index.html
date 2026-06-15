@@ -4,92 +4,115 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>단골집 주문</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gothic+A1:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f5f5; }
-    .app { max-width: 480px; margin: 0 auto; background: #fff; min-height: 100vh; }
+    body { font-family: 'Gothic A1', sans-serif; background: #F1EBE4; color: #231910; }
+    .app { max-width: 480px; margin: 0 auto; background: #FFF8F2; min-height: 100vh; }
     .screen { display: none; }
     .screen.active { display: block; }
 
     /* 공통 */
-    .topbar { display: flex; align-items: center; gap: 10px; padding: 16px; border-bottom: 1px solid #eee; background: #fff; }
-    .topbar-title { font-size: 18px; font-weight: 600; flex: 1; }
-    .back-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: #555; padding: 4px; }
-    .icon-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: #555; padding: 4px; }
+    .topbar { display: flex; align-items: center; gap: 12px; padding: 18px 20px; background: #fff; border-bottom: 1px solid #F3EAE1; }
+    .topbar-title { font-family: 'Jua', sans-serif; font-size: 21px; color: #231910; flex: 1; line-height: 1.2; }
+    .topbar-group { flex: 1; }
+    .topbar-sub { font-size: 14px; color: #9A8676; margin-top: 2px; }
+    .back-btn { width: 40px; height: 40px; flex-shrink: 0; border-radius: 13px; border: none; background: #FBF1E8; font-size: 22px; cursor: pointer; color: #7A6757; display: flex; align-items: center; justify-content: center; padding: 0; }
+    .logout-btn { font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 999px; border: 1px solid #EADFD3; background: none; cursor: pointer; color: #A2917F; }
+
+    /* 음식 클레이 아이콘 */
+    .food-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .food-icon--sm { width: 42px; height: 42px; font-size: 23px; border-radius: 14px; }
+    .food-icon--md { width: 62px; height: 62px; font-size: 33px; border-radius: 20px; }
+    .food-icon--lg { width: 60px; height: 60px; font-size: 32px; border-radius: 19px; }
+    .food-icon--xl { width: 74px; height: 74px; font-size: 38px; border-radius: 24px; }
+    .food-icon--hero { width: 96px; height: 96px; font-size: 50px; border-radius: 30px; }
+    .icon-orange { background: linear-gradient(150deg,#FFC785,#FF9442); box-shadow: 0 9px 16px -6px rgba(190,95,40,.5), inset 0 4px 6px rgba(255,255,255,.6), inset 0 -7px 10px rgba(150,70,25,.3); }
+    .icon-red { background: linear-gradient(150deg,#FF9D8A,#FF6A52); box-shadow: 0 9px 16px -6px rgba(190,75,55,.5), inset 0 4px 6px rgba(255,255,255,.55), inset 0 -7px 10px rgba(160,55,40,.32); }
+    .icon-yellow { background: linear-gradient(150deg,#FFDC7A,#FFB22E); box-shadow: 0 9px 16px -6px rgba(190,140,40,.5), inset 0 4px 6px rgba(255,255,255,.6), inset 0 -7px 10px rgba(160,110,25,.3); }
+    .icon-tomato { background: linear-gradient(150deg,#FF9F7E,#F2603D); box-shadow: 0 9px 16px -6px rgba(190,75,45,.5), inset 0 4px 6px rgba(255,255,255,.55), inset 0 -7px 10px rgba(160,55,35,.32); }
+    .icon-green { background: linear-gradient(150deg,#B6DD8E,#7FC15F); box-shadow: 0 9px 16px -6px rgba(110,150,60,.5), inset 0 4px 6px rgba(255,255,255,.55), inset 0 -7px 10px rgba(90,120,45,.3); }
 
     /* 로그인 */
     .login-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 40px; gap: 24px; }
-    .login-title { font-size: 26px; font-weight: 700; text-align: center; }
-    .login-sub { font-size: 15px; color: #777; text-align: center; line-height: 1.6; }
-    .google-btn { display: flex; align-items: center; gap: 12px; padding: 14px 28px; border: 1px solid #ddd; border-radius: 12px; background: #fff; font-size: 16px; font-weight: 500; cursor: pointer; width: 100%; justify-content: center; }
-    .google-btn:active { background: #f5f5f5; }
+    .login-title { font-family: 'Jua', sans-serif; font-size: 30px; text-align: center; }
+    .login-sub { font-size: 15px; color: #9A8676; text-align: center; line-height: 1.7; }
+    .google-btn { display: flex; align-items: center; gap: 12px; padding: 0 28px; height: 60px; border: 2px solid #EFE2D5; border-radius: 18px; background: #fff; font-size: 17px; font-weight: 800; cursor: pointer; width: 100%; justify-content: center; color: #231910; }
+    .google-btn:active { background: #FFF6EF; }
 
     /* 홈(관리자) */
-    .store-list { padding: 12px; }
-    .store-card { background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 16px; margin-bottom: 10px; }
-    .store-name { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
-    .store-meta { font-size: 14px; color: #888; margin-bottom: 6px; }
-    .store-menus { font-size: 13px; color: #aaa; margin-bottom: 12px; }
-    .store-actions { display: flex; gap: 8px; }
-    .btn-sm { font-size: 13px; padding: 7px 14px; border-radius: 8px; border: 1px solid #ddd; background: none; cursor: pointer; color: #555; }
-    .btn-sm.danger { color: #c0392b; border-color: #f5c6c6; }
-    .add-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 24px); margin: 4px 12px; padding: 16px; border: 1.5px dashed #ccc; border-radius: 14px; background: none; cursor: pointer; font-size: 16px; color: #888; }
+    .store-list { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+    .store-card { background: #fff; border: 1px solid #F0E4D8; border-radius: 24px; padding: 16px; box-shadow: 0 8px 18px -12px rgba(150,90,50,.35); }
+    .store-card-head { display: flex; gap: 13px; align-items: center; }
+    .store-info { flex: 1; min-width: 0; }
+    .store-name { font-family: 'Jua', sans-serif; font-size: 22px; line-height: 1.1; }
+    .store-meta { font-size: 14px; color: #9A8676; margin-top: 4px; }
+    .store-menus { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 12px; }
+    .menu-tag { background: #FFF1E6; color: #C2571F; font-size: 13px; font-weight: 700; border-radius: 999px; padding: 6px 12px; }
+    .store-actions { display: flex; gap: 9px; margin-top: 14px; }
+    .btn-sm { flex: 1; text-align: center; height: 46px; line-height: 46px; border-radius: 14px; border: none; font-size: 16px; font-weight: 800; cursor: pointer; background: #FBF1E8; color: #9A6A3C; }
+    .btn-sm.danger { background: #FCECEC; color: #D14B3C; }
+    .add-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 28px); margin: 0 14px 14px; height: 56px; border-radius: 20px; border: 2px dashed #E3CDB6; background: #FFFBF6; cursor: pointer; font-size: 17px; font-weight: 800; color: #B07A45; }
 
     /* 공유 패널 */
-    .share-panel { margin: 8px 12px; padding: 16px; background: #f0f7ff; border-radius: 14px; border: 1px solid #c8e0ff; }
-    .share-label { font-size: 13px; color: #555; margin-bottom: 8px; font-weight: 500; }
-    .share-url { font-size: 12px; color: #888; word-break: break-all; line-height: 1.5; margin-bottom: 10px; padding: 8px; background: #fff; border-radius: 8px; border: 1px solid #ddd; }
-    .share-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .copy-btn { padding: 10px; font-size: 14px; border-radius: 8px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
-    .kakao-btn { padding: 10px; font-size: 14px; font-weight: 600; border-radius: 8px; border: none; background: #FEE500; color: #3C1E1E; cursor: pointer; }
+    .share-panel { margin: 0 14px 14px; padding: 18px; background: #FFF3E7; border: 1.5px solid #FBDBB5; border-radius: 24px; }
+    .share-label { font-weight: 800; font-size: 16px; color: #B5651A; display: flex; align-items: center; gap: 7px; margin-bottom: 12px; }
+    .share-url { font-size: 13px; color: #8A7868; word-break: break-all; line-height: 1.4; padding: 12px 14px; background: #fff; border-radius: 14px; border: 1px solid #F0DEC7; }
+    .share-btns { display: flex; gap: 9px; margin-top: 12px; }
+    .copy-btn { flex: 1; text-align: center; height: 52px; font-size: 16px; font-weight: 800; border-radius: 15px; border: 1.5px solid #EAD6BC; background: #fff; color: #8A6A45; cursor: pointer; }
+    .kakao-btn { flex: 1.3; text-align: center; height: 52px; font-size: 16px; font-weight: 900; border-radius: 15px; border: none; background: #FEE500; color: #3C1E1E; cursor: pointer; box-shadow: 0 8px 16px -8px rgba(220,195,0,.7); }
 
     /* 가게 등록/수정 폼 */
-    .form-section { padding: 16px; }
-    .field-group { margin-bottom: 18px; }
-    .field-label { font-size: 14px; color: #555; margin-bottom: 6px; display: block; font-weight: 500; }
-    input[type=text], input[type=tel] { width: 100%; font-size: 16px; padding: 13px 14px; border-radius: 10px; border: 1px solid #ddd; outline: none; }
-    input:focus { border-color: #185FA5; }
-    .menu-chip-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-    .menu-chip { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f0f4ff; border: 1px solid #c5d5f5; border-radius: 20px; font-size: 14px; }
-    .menu-chip .del { background: none; border: none; cursor: pointer; font-size: 16px; color: #999; padding: 0; line-height: 1; }
-    .menu-input-row { display: flex; gap: 8px; }
-    .menu-input-row input { flex: 1; font-size: 15px; padding: 11px 13px; border-radius: 10px; border: 1px solid #ddd; }
-    .add-menu-btn { width: 44px; height: 44px; border-radius: 10px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; color: #185FA5; flex-shrink: 0; }
-    .save-btn { display: block; width: 100%; padding: 18px; font-size: 17px; font-weight: 600; border-radius: 12px; border: none; background: #185FA5; color: #fff; cursor: pointer; margin-top: 8px; }
-    .save-btn:active { opacity: 0.85; }
+    .form-section { padding: 22px 20px; display: flex; flex-direction: column; gap: 22px; }
+    .field-label { font-size: 15px; font-weight: 800; color: #7A6757; margin-bottom: 9px; display: block; }
+    input[type=text], input[type=tel] { width: 100%; height: 60px; font-size: 18px; padding: 0 18px; border-radius: 18px; border: 2px solid #EFE2D5; outline: none; font-family: inherit; color: #231910; background: #fff; }
+    input:focus { border-color: #FF8A3D; }
+    .menu-chip-list { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 11px; }
+    .menu-chip { display: flex; align-items: center; gap: 8px; padding: 9px 14px; background: #FFF1E6; border: none; border-radius: 999px; font-size: 16px; font-weight: 700; color: #C2571F; }
+    .menu-chip .del { background: none; border: none; cursor: pointer; font-size: 16px; font-weight: 900; color: #C2571F; opacity: .55; padding: 0; line-height: 1; }
+    .menu-input-row { display: flex; gap: 9px; }
+    .menu-input-row input { flex: 1; height: 54px; font-size: 16px; border-radius: 16px; }
+    .add-menu-btn { width: 54px; height: 54px; flex-shrink: 0; border-radius: 16px; border: none; background: linear-gradient(180deg,#FF8A3D,#F26A1B); cursor: pointer; font-size: 26px; font-weight: 900; color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 15px -7px rgba(230,99,30,.6); }
+    .save-btn { display: block; width: 100%; height: 64px; font-size: 21px; font-weight: 900; border-radius: 20px; border: none; background: linear-gradient(180deg,#FF8A3D,#F26A1B); color: #fff; cursor: pointer; margin-top: 8px; box-shadow: 0 14px 24px -10px rgba(230,99,30,.65); }
+    .save-btn:active { transform: translateY(1px); }
 
     /* 부모님 홈 */
-    .parent-list { padding: 16px; }
-    .parent-store-card { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 22px 18px; margin-bottom: 12px; cursor: pointer; text-align: center; }
-    .parent-store-card:active { background: #f0f7ff; }
-    .parent-store-name { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
-    .parent-store-meta { font-size: 15px; color: #999; }
+    .parent-list { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+    .parent-store-card { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 16px; width: 100%; background: #fff; border: 1px solid #F2E9E0; border-radius: 24px; padding: 15px 16px; box-shadow: 0 7px 16px -10px rgba(150,90,50,.3); font-family: inherit; }
+    .parent-store-card:active { transform: translateY(1px); }
+    .parent-store-info { flex: 1; min-width: 0; }
+    .parent-store-name { font-family: 'Jua', sans-serif; font-size: 25px; line-height: 1.15; }
+    .parent-store-meta { font-size: 15px; color: #9A8676; margin-top: 3px; }
+    .parent-store-arrow { font-size: 34px; color: #E0BCA2; font-weight: 300; line-height: 0; flex-shrink: 0; }
 
     /* 메뉴 선택 */
-    .menu-order-list { padding: 12px; }
-    .menu-item { display: flex; align-items: center; gap: 14px; padding: 18px 16px; background: #fff; border: 1px solid #eee; border-radius: 14px; margin-bottom: 10px; cursor: pointer; }
-    .menu-item.selected { border-color: #185FA5; background: #f0f7ff; }
-    .menu-check { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #ddd; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 17px; }
-    .menu-item.selected .menu-check { background: #185FA5; border-color: #185FA5; color: #fff; }
-    .menu-item-name { font-size: 20px; font-weight: 500; }
+    .order-heading { font-family: 'Jua', sans-serif; font-size: 21px; margin: 18px 18px 4px; }
+    .menu-order-list { padding: 16px 18px; display: flex; flex-direction: column; gap: 13px; }
+    .menu-item { display: flex; align-items: center; gap: 15px; background: #fff; border: 2px solid #F1E7DD; border-radius: 22px; padding: 15px 16px; cursor: pointer; }
+    .menu-item.selected { background: #FFF6EF; border-color: #FF8A3D; box-shadow: 0 8px 16px -10px rgba(230,99,30,.4); }
+    .menu-item-name { flex: 1; font-family: 'Jua', sans-serif; font-size: 23px; }
+    .menu-check { width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%; border: 2.5px solid #E3D5C8; display: flex; align-items: center; justify-content: center; font-size: 19px; font-weight: 900; color: #fff; }
+    .menu-item.selected .menu-check { background: #F26A1B; border-color: #F26A1B; box-shadow: 0 4px 8px -2px rgba(230,99,30,.5); }
 
     /* 주문 바 */
-    .order-bar { margin: 12px; padding: 16px; background: #f5f5f5; border-radius: 14px; }
-    .order-summary { font-size: 15px; color: #333; margin-bottom: 14px; min-height: 22px; }
-    .call-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 22px; font-size: 20px; font-weight: 700; border-radius: 14px; border: none; background: #185FA5; color: #fff; cursor: pointer; }
-    .call-btn:disabled { background: #ddd; color: #aaa; cursor: default; }
+    .order-bar { padding: 16px 18px 22px; background: #fff; border-top: 1px solid #F3EAE1; box-shadow: 0 -10px 24px -16px rgba(120,70,40,.3); }
+    .order-summary { font-size: 15px; color: #9A8676; margin: 0 4px 10px; min-height: 21px; }
+    .order-summary b { color: #E8631E; }
+    .call-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 68px; font-size: 23px; font-weight: 900; border-radius: 22px; border: none; background: linear-gradient(180deg,#FF8A3D,#F26A1B); color: #fff; cursor: pointer; box-shadow: 0 14px 24px -10px rgba(230,99,30,.65); }
+    .call-btn:disabled { background: #EFE2D5; color: #C7B7A8; box-shadow: none; cursor: default; }
 
     /* 주문 메모 */
-    .memo-section { padding: 16px; }
-    .memo-card { background: #f5f5f5; border-radius: 14px; padding: 22px; text-align: center; margin-bottom: 16px; }
-    .memo-store-name { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
-    .memo-phone { font-size: 18px; color: #185FA5; font-weight: 600; }
-    .memo-script-label { font-size: 14px; color: #888; margin-bottom: 8px; font-weight: 500; }
-    .memo-script { font-size: 22px; font-weight: 600; line-height: 1.8; white-space: pre-line; background: #f0f7ff; border: 1px solid #c8e0ff; border-radius: 14px; padding: 20px; }
+    .memo-section { padding: 18px; }
+    .memo-card { background: #fff; border: 1px solid #F0E4D8; border-radius: 24px; padding: 26px; text-align: center; margin-bottom: 16px; box-shadow: 0 8px 18px -12px rgba(150,90,50,.35); }
+    .memo-store-name { font-family: 'Jua', sans-serif; font-size: 25px; margin-bottom: 8px; }
+    .memo-phone { font-size: 18px; color: #E8631E; font-weight: 700; }
+    .memo-script-label { font-size: 15px; color: #9A8676; margin-bottom: 10px; font-weight: 700; }
+    .memo-script { font-size: 22px; font-weight: 700; line-height: 1.8; white-space: pre-line; background: #FFF6EF; border: 2px solid #FFD9B8; border-radius: 22px; padding: 22px; }
 
     /* 유틸 */
-    .empty-hint { text-align: center; padding: 60px 24px; color: #aaa; font-size: 15px; line-height: 1.8; }
-    .logout-btn { font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1px solid #eee; background: none; cursor: pointer; color: #aaa; }
+    .empty-hint { text-align: center; padding: 60px 24px; color: #B8A795; font-size: 15px; line-height: 1.8; }
   </style>
 </head>
 <body>
@@ -98,7 +121,7 @@
   <!-- 로그인 화면 -->
   <div id="screen-login" class="screen active">
     <div class="login-wrap">
-      <div style="font-size: 48px;">🍜</div>
+      <div class="food-icon food-icon--hero icon-orange">🍜</div>
       <div class="login-title">단골집 주문</div>
       <div class="login-sub">부모님이 쉽게 전화 주문할 수 있도록<br>가게와 메뉴를 등록해드리세요</div>
       <button class="google-btn" onclick="loginWithGoogle()">
@@ -111,42 +134,39 @@
   <!-- 관리자 홈 -->
   <div id="screen-home" class="screen">
     <div class="topbar">
-      <span class="topbar-title">🍜 단골집 주문</span>
+      <div class="food-icon food-icon--sm icon-orange">🍜</div>
+      <span class="topbar-title">단골집 관리</span>
       <button class="logout-btn" onclick="logout()">로그아웃</button>
-      <button class="icon-btn" onclick="showEdit(null)" aria-label="가게 추가">＋</button>
     </div>
     <div class="store-list" id="store-list"></div>
     <button class="add-btn" onclick="showEdit(null)">＋ 가게 추가하기</button>
-    <div style="padding: 0 12px; margin-top: 8px;" id="share-section">
-      <div class="share-panel">
-        <div class="share-label">📤 부모님께 공유할 링크</div>
-        <div class="share-url" id="share-url-text">가게를 추가하면 링크가 생성됩니다</div>
-        <div class="share-btns">
-          <button class="copy-btn" onclick="copyLink()">링크 복사</button>
-          <button class="kakao-btn" onclick="shareLink()">카톡으로 보내기</button>
-        </div>
+    <div class="share-panel">
+      <div class="share-label">📮 부모님께 보낼 링크</div>
+      <div class="share-url" id="share-url-text">가게를 추가하면 링크가 생성됩니다</div>
+      <div class="share-btns">
+        <button class="copy-btn" onclick="copyLink()">📋 링크 복사</button>
+        <button class="kakao-btn" onclick="shareLink()">💬 카톡으로 보내기</button>
       </div>
     </div>
-    <div style="height: 24px;"></div>
   </div>
 
   <!-- 가게 등록/수정 -->
   <div id="screen-edit" class="screen">
     <div class="topbar">
-      <button class="back-btn" onclick="showHome()" aria-label="뒤로">←</button>
+      <button class="back-btn" onclick="showHome()" aria-label="뒤로">‹</button>
       <span class="topbar-title" id="edit-title">가게 등록</span>
     </div>
     <div class="form-section">
       <div class="field-group">
-        <label class="field-label">가게 이름</label>
+        <label class="field-label">🏠 가게 이름</label>
         <input type="text" id="f-name" placeholder="예) 단골 짜장면집">
       </div>
       <div class="field-group">
-        <label class="field-label">전화번호</label>
+        <label class="field-label">📞 전화번호</label>
         <input type="tel" id="f-phone" placeholder="예) 02-1234-5678">
       </div>
       <div class="field-group">
-        <label class="field-label">자주 시키는 메뉴</label>
+        <label class="field-label">🍽 자주 시키는 메뉴</label>
         <div id="menu-chips" class="menu-chip-list"></div>
         <div class="menu-input-row">
           <input type="text" id="f-menu" placeholder="메뉴 입력 후 + 버튼" onkeydown="if(event.key==='Enter')addMenu()">
@@ -160,7 +180,11 @@
   <!-- 부모님 홈 -->
   <div id="screen-parent" class="screen">
     <div class="topbar">
-      <span class="topbar-title">🍜 어디 시킬까요?</span>
+      <div class="food-icon food-icon--sm icon-orange">🍜</div>
+      <div class="topbar-group">
+        <div class="topbar-title">어디서 시킬까요?</div>
+        <div class="topbar-sub">오늘은 뭐 드실래요?</div>
+      </div>
     </div>
     <div class="parent-list" id="parent-list"></div>
   </div>
@@ -168,9 +192,11 @@
   <!-- 메뉴 선택 -->
   <div id="screen-order" class="screen">
     <div class="topbar">
-      <button class="back-btn" onclick="showParent()" aria-label="뒤로">←</button>
+      <button class="back-btn" onclick="showParent()" aria-label="뒤로">‹</button>
+      <div class="food-icon food-icon--sm" id="order-store-icon"></div>
       <span class="topbar-title" id="order-store-name"></span>
     </div>
+    <div class="order-heading">무엇을 드실까요?</div>
     <div class="menu-order-list" id="menu-order-list"></div>
     <div class="order-bar">
       <div class="order-summary" id="order-summary">메뉴를 골라주세요</div>
@@ -181,7 +207,7 @@
   <!-- 주문 메모 -->
   <div id="screen-memo" class="screen">
     <div class="topbar">
-      <button class="back-btn" onclick="backToOrder()" aria-label="뒤로">←</button>
+      <button class="back-btn" onclick="backToOrder()" aria-label="뒤로">‹</button>
       <span class="topbar-title">주문 메모</span>
     </div>
     <div class="memo-section">
@@ -337,6 +363,21 @@
     }[c]));
   }
 
+  // 가게/메뉴 이름 키워드로 음식 클레이 아이콘 매핑
+  const FOOD_ICON_TYPES = [
+    { keys: ['치킨', '닭'], emoji: '🍗', cls: 'icon-red' },
+    { keys: ['피자'], emoji: '🍕', cls: 'icon-tomato' },
+    { keys: ['김밥', '돈까스', '라면', '분식', '초밥'], emoji: '🍙', cls: 'icon-yellow' },
+    { keys: ['죽'], emoji: '🥣', cls: 'icon-green' },
+    { keys: ['탕수육', '새우', '튀김'], emoji: '🍤', cls: 'icon-red' },
+  ];
+  const DEFAULT_FOOD_ICON = { emoji: '🍜', cls: 'icon-orange' };
+
+  function getFoodIcon(text) {
+    const found = FOOD_ICON_TYPES.find(t => t.keys.some(k => String(text).includes(k)));
+    return found || DEFAULT_FOOD_ICON;
+  }
+
   window.showHome = () => { showScreen('screen-home'); loadStores(); };
   window.showEdit = (storeKey) => {
     editingStoreKey = storeKey;
@@ -410,17 +451,26 @@
         return;
       }
       const stores = snap.val();
-      el.innerHTML = Object.entries(stores).map(([key, s]) => `
+      el.innerHTML = Object.entries(stores).map(([key, s]) => {
+        const icon = getFoodIcon(s.name);
+        const menuTags = (s.menus || []).map(m => `<span class="menu-tag">${escapeHtml(m)}</span>`).join('');
+        return `
         <div class="store-card">
-          <div class="store-name">${escapeHtml(s.name)}</div>
-          <div class="store-meta">${escapeHtml(s.phone)}</div>
-          <div class="store-menus">${escapeHtml((s.menus || []).join(', ') || '메뉴 없음')}</div>
+          <div class="store-card-head">
+            <div class="food-icon food-icon--lg ${icon.cls}">${icon.emoji}</div>
+            <div class="store-info">
+              <div class="store-name">${escapeHtml(s.name)}</div>
+              <div class="store-meta">${escapeHtml(s.phone)}</div>
+            </div>
+          </div>
+          ${menuTags ? `<div class="store-menus">${menuTags}</div>` : ''}
           <div class="store-actions">
             <button class="btn-sm" onclick="showEdit('${key}')">✏️ 수정</button>
             <button class="btn-sm danger" onclick="deleteStore('${key}')">🗑 삭제</button>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       // 공유 링크 갱신
       const base = location.href.split('?')[0];
@@ -495,27 +545,42 @@
       return;
     }
     parentStores = snap.val();
-    el.innerHTML = Object.entries(parentStores).map(([key, s]) => `
-      <div class="parent-store-card" onclick="showOrder('${key}')">
-        <div class="parent-store-name">${escapeHtml(s.name)}</div>
-        <div class="parent-store-meta">메뉴 ${(s.menus || []).length}개</div>
-      </div>
-    `).join('');
+    el.innerHTML = Object.entries(parentStores).map(([key, s]) => {
+      const icon = getFoodIcon(s.name);
+      return `
+      <button class="parent-store-card" onclick="showOrder('${key}')">
+        <div class="food-icon food-icon--xl ${icon.cls}">${icon.emoji}</div>
+        <div class="parent-store-info">
+          <div class="parent-store-name">${escapeHtml(s.name)}</div>
+          <div class="parent-store-meta">${escapeHtml((s.menus || []).join(' · ') || '메뉴 없음')}</div>
+        </div>
+        <div class="parent-store-arrow">›</div>
+      </button>
+    `;
+    }).join('');
   }
 
   window.showOrder = (key) => {
     currentStoreData = parentStores[key];
     selectedMenus = [];
     document.getElementById('order-store-name').textContent = currentStoreData.name;
+    const storeIcon = getFoodIcon(currentStoreData.name);
+    const storeIconEl = document.getElementById('order-store-icon');
+    storeIconEl.className = `food-icon food-icon--sm ${storeIcon.cls}`;
+    storeIconEl.textContent = storeIcon.emoji;
     const menus = currentStoreData.menus || [];
     const el = document.getElementById('menu-order-list');
     el.innerHTML = menus.length
-      ? menus.map((m, i) => `
+      ? menus.map((m, i) => {
+          const icon = getFoodIcon(m);
+          return `
           <div class="menu-item" id="mi-${i}" onclick="toggleMenu(${i})">
-            <div class="menu-check" id="mc-${i}"></div>
+            <div class="food-icon food-icon--md ${icon.cls}">${icon.emoji}</div>
             <span class="menu-item-name">${escapeHtml(m)}</span>
+            <div class="menu-check" id="mc-${i}"></div>
           </div>
-        `).join('')
+        `;
+        }).join('')
       : '<div class="empty-hint">등록된 메뉴가 없어요.</div>';
     updateOrderBar();
     showScreen('screen-order');
@@ -545,7 +610,7 @@
       sum.textContent = '메뉴를 골라주세요';
       btn.disabled = true;
     } else {
-      sum.textContent = selectedMenus.join(', ');
+      sum.innerHTML = `선택한 메뉴 · <b>${escapeHtml(selectedMenus.join(', '))}</b>`;
       btn.disabled = false;
     }
   }
@@ -554,7 +619,7 @@
     document.getElementById('memo-store-name').textContent = currentStoreData.name;
     document.getElementById('memo-phone').textContent = currentStoreData.phone;
     document.getElementById('memo-script').textContent =
-      `여기 ${currentStoreData.name}인데요,\n${selectedMenus.join(', ')} 주세요`;
+      `${selectedMenus.join(', ')} 주세요`;
     showScreen('screen-memo');
   };
 
