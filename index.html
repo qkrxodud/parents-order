@@ -68,6 +68,11 @@
     .copy-btn { flex: 1; text-align: center; height: 52px; font-size: 16px; font-weight: 800; border-radius: 15px; border: 1.5px solid #EAD6BC; background: #fff; color: #8A6A45; cursor: pointer; }
     .kakao-btn { flex: 1.3; text-align: center; height: 52px; font-size: 16px; font-weight: 900; border-radius: 15px; border: none; background: #FEE500; color: #3C1E1E; cursor: pointer; box-shadow: 0 8px 16px -8px rgba(220,195,0,.7); }
 
+    /* 우리집 주소 */
+    .address-row { display: flex; gap: 9px; }
+    .address-row input { flex: 1; }
+    .address-save-btn { flex-shrink: 0; padding: 0 22px; height: 60px; font-size: 16px; font-weight: 800; border-radius: 18px; border: none; background: linear-gradient(180deg,#FF8A3D,#F26A1B); color: #fff; cursor: pointer; box-shadow: 0 8px 15px -7px rgba(230,99,30,.6); }
+
     /* 가게 등록/수정 폼 */
     .form-section { padding: 22px 20px; display: flex; flex-direction: column; gap: 22px; }
     .field-label { font-size: 15px; font-weight: 800; color: #7A6757; margin-bottom: 9px; display: block; }
@@ -99,6 +104,12 @@
     .menu-item-name { flex: 1; font-family: 'Jua', sans-serif; font-size: 23px; }
     .menu-check { width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%; border: 2.5px solid #E3D5C8; display: flex; align-items: center; justify-content: center; font-size: 19px; font-weight: 900; color: #fff; }
     .menu-item.selected .menu-check { background: #F26A1B; border-color: #F26A1B; box-shadow: 0 4px 8px -2px rgba(230,99,30,.5); }
+
+    /* 포장/배달 선택 */
+    .order-type-heading { font-family: 'Jua', sans-serif; font-size: 21px; margin: 20px 18px 12px; }
+    .order-type-toggle { display: flex; gap: 10px; padding: 0 18px 18px; }
+    .order-type-btn { flex: 1; height: 60px; border-radius: 20px; border: 2px solid #F1E7DD; background: #fff; font-size: 19px; font-weight: 800; color: #9A8676; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .order-type-btn.selected { background: #FFF6EF; border-color: #FF8A3D; color: #E8631E; box-shadow: 0 8px 16px -10px rgba(230,99,30,.4); }
 
     /* 주문 바 */
     .order-bar { padding: 16px 18px 22px; background: #fff; border-top: 1px solid #F3EAE1; box-shadow: 0 -10px 24px -16px rgba(120,70,40,.3); }
@@ -149,6 +160,13 @@
     </div>
     <div class="store-list" id="store-list"></div>
     <button class="add-btn" onclick="showEdit(null)">＋ 가게 추가하기</button>
+    <div class="share-panel">
+      <div class="share-label">🏠 우리집 주소</div>
+      <div class="address-row">
+        <input type="text" id="f-address" placeholder="배달 주문 시 사용할 주소">
+        <button class="address-save-btn" onclick="saveAddress()">저장</button>
+      </div>
+    </div>
     <div class="share-panel">
       <div class="share-label">📮 부모님께 보낼 링크</div>
       <div class="share-url" id="share-url-text">가게를 추가하면 링크가 생성됩니다</div>
@@ -207,6 +225,11 @@
     </div>
     <div class="order-heading">무엇을 드실까요?</div>
     <div class="menu-order-list" id="menu-order-list"></div>
+    <div class="order-type-heading">어떻게 받으실까요?</div>
+    <div class="order-type-toggle">
+      <button class="order-type-btn" id="type-pickup" onclick="selectOrderType('포장')">🛍️ 포장</button>
+      <button class="order-type-btn" id="type-delivery" onclick="selectOrderType('배달')">🛵 배달</button>
+    </div>
     <div class="order-bar">
       <div class="order-summary" id="order-summary">메뉴를 골라주세요</div>
       <button class="call-btn" id="call-btn" onclick="doCall()" disabled>📞 전화 주문하기</button>
@@ -352,7 +375,9 @@
   let editingStoreKey = null;
   let currentStoreData = null;
   let selectedMenus = [];
+  let selectedOrderType = '포장';
   let parentStores = {};
+  let familyAddress = '';
   let unsubscribeStores = null;
 
   // ──────────────────────────────
@@ -394,7 +419,7 @@
       || (/Android/i.test(ua) && /; ?wv\)/i.test(ua));
   }
 
-  window.showHome = () => { showScreen('screen-home'); loadStores(); };
+  window.showHome = () => { showScreen('screen-home'); loadStores(); loadAddress(); };
   window.showEdit = (storeKey) => {
     editingStoreKey = storeKey;
     document.getElementById('edit-title').textContent = storeKey ? '가게 수정' : '가게 등록';
@@ -508,6 +533,20 @@
   }
 
   // ──────────────────────────────
+  // 우리집 주소 (배달 주문 시 안내용)
+  // ──────────────────────────────
+  async function loadAddress() {
+    const snap = await get(ref(db, `families/${familyId}/address`));
+    document.getElementById('f-address').value = snap.exists() ? snap.val() : '';
+  }
+
+  window.saveAddress = async () => {
+    const address = document.getElementById('f-address').value.trim();
+    await set(ref(db, `families/${familyId}/address`), address);
+    alert('주소가 저장되었습니다.');
+  };
+
+  // ──────────────────────────────
   // 가게 저장
   // ──────────────────────────────
   window.saveStore = async () => {
@@ -567,6 +606,9 @@
   // 부모님 화면
   // ──────────────────────────────
   async function loadParentStores() {
+    const addressSnap = await get(ref(db, `families/${familyId}/address`));
+    familyAddress = addressSnap.exists() ? addressSnap.val() : '';
+
     const snap = await get(ref(db, `families/${familyId}/stores`));
     const el = document.getElementById('parent-list');
     if (!snap.exists()) {
@@ -592,6 +634,8 @@
   window.showOrder = (key) => {
     currentStoreData = parentStores[key];
     selectedMenus = [];
+    selectedOrderType = '포장';
+    updateOrderTypeUI();
     document.getElementById('order-store-name').textContent = currentStoreData.name;
     const storeIcon = getFoodIcon(currentStoreData.name);
     const storeIconEl = document.getElementById('order-store-icon');
@@ -644,11 +688,25 @@
     }
   }
 
+  function updateOrderTypeUI() {
+    document.getElementById('type-pickup').classList.toggle('selected', selectedOrderType === '포장');
+    document.getElementById('type-delivery').classList.toggle('selected', selectedOrderType === '배달');
+  }
+
+  window.selectOrderType = (type) => {
+    selectedOrderType = type;
+    updateOrderTypeUI();
+  };
+
   window.doCall = () => {
     document.getElementById('memo-store-name').textContent = currentStoreData.name;
     document.getElementById('memo-phone').textContent = currentStoreData.phone;
-    document.getElementById('memo-script').textContent =
-      `${selectedMenus.join(', ')} 주세요`;
+    const typeText = selectedOrderType === '배달' ? '배달로' : '포장으로';
+    let script = `${selectedMenus.join(', ')} ${typeText} 주세요.`;
+    if (selectedOrderType === '배달' && familyAddress) {
+      script += `\n주소는 ${familyAddress}입니다.`;
+    }
+    document.getElementById('memo-script').textContent = script;
     showScreen('screen-memo');
   };
 
