@@ -79,6 +79,14 @@
     .call-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 22px; font-size: 20px; font-weight: 700; border-radius: 14px; border: none; background: #185FA5; color: #fff; cursor: pointer; }
     .call-btn:disabled { background: #ddd; color: #aaa; cursor: default; }
 
+    /* 주문 메모 */
+    .memo-section { padding: 16px; }
+    .memo-card { background: #f5f5f5; border-radius: 14px; padding: 22px; text-align: center; margin-bottom: 16px; }
+    .memo-store-name { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+    .memo-phone { font-size: 18px; color: #185FA5; font-weight: 600; }
+    .memo-script-label { font-size: 14px; color: #888; margin-bottom: 8px; font-weight: 500; }
+    .memo-script { font-size: 22px; font-weight: 600; line-height: 1.8; white-space: pre-line; background: #f0f7ff; border: 1px solid #c8e0ff; border-radius: 14px; padding: 20px; }
+
     /* 유틸 */
     .empty-hint { text-align: center; padding: 60px 24px; color: #aaa; font-size: 15px; line-height: 1.8; }
     .logout-btn { font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1px solid #eee; background: none; cursor: pointer; color: #aaa; }
@@ -167,6 +175,25 @@
     <div class="order-bar">
       <div class="order-summary" id="order-summary">메뉴를 골라주세요</div>
       <button class="call-btn" id="call-btn" onclick="doCall()" disabled>📞 전화 주문하기</button>
+    </div>
+  </div>
+
+  <!-- 주문 메모 -->
+  <div id="screen-memo" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="backToOrder()" aria-label="뒤로">←</button>
+      <span class="topbar-title">주문 메모</span>
+    </div>
+    <div class="memo-section">
+      <div class="memo-card">
+        <div class="memo-store-name" id="memo-store-name"></div>
+        <div class="memo-phone" id="memo-phone"></div>
+      </div>
+      <div class="memo-script-label">📋 이렇게 말씀해보세요</div>
+      <div class="memo-script" id="memo-script"></div>
+    </div>
+    <div class="order-bar">
+      <button class="call-btn" onclick="callStore()">📞 전화 걸기</button>
     </div>
   </div>
 
@@ -524,10 +551,18 @@
   }
 
   window.doCall = () => {
-    if (confirm(`${currentStoreData.name}에 전화할까요?\n\n주문: ${selectedMenus.join(', ')}`)) {
-      location.href = 'tel:' + currentStoreData.phone.replace(/[^0-9+]/g, '');
-    }
+    document.getElementById('memo-store-name').textContent = currentStoreData.name;
+    document.getElementById('memo-phone').textContent = currentStoreData.phone;
+    document.getElementById('memo-script').textContent =
+      `여기 ${currentStoreData.name}인데요,\n${selectedMenus.join(', ')} 주세요`;
+    showScreen('screen-memo');
   };
+
+  window.callStore = () => {
+    location.href = 'tel:' + currentStoreData.phone.replace(/[^0-9+]/g, '');
+  };
+
+  window.backToOrder = () => showScreen('screen-order');
 </script>
 </body>
 </html>
