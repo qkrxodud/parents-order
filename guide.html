@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사용 가이드 — 단골집 주문</title>
+  <meta name="description" content="단골집 주문 앱을 처음 쓰는 분도 바로 따라 할 수 있는 단계별 사용 가이드. 자녀 등록 방법과 부모님 주문 방법을 그림과 함께 안내합니다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gothic+A1:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Gothic A1', sans-serif; background: #F1EBE4; color: #231910; -webkit-font-smoothing: antialiased; }
+    .page { max-width: 480px; margin: 0 auto; background: #FFF8F2; min-height: 100vh; overflow: hidden; }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    /* 음식 클레이 아이콘 (앱과 동일한 톤) */
+    .food-icon { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .food-icon--sm { width: 46px; height: 46px; font-size: 25px; border-radius: 15px; }
+    .food-icon--md { width: 60px; height: 60px; font-size: 32px; border-radius: 19px; }
+    .icon-orange { background: linear-gradient(150deg,#FFC785,#FF9442); box-shadow: 0 9px 16px -6px rgba(190,95,40,.5), inset 0 4px 6px rgba(255,255,255,.6), inset 0 -7px 10px rgba(150,70,25,.3); }
+    .icon-red { background: linear-gradient(150deg,#FF9D8A,#FF6A52); box-shadow: 0 9px 16px -6px rgba(190,75,55,.5), inset 0 4px 6px rgba(255,255,255,.55), inset 0 -7px 10px rgba(160,55,40,.32); }
+    .icon-yellow { background: linear-gradient(150deg,#FFDC7A,#FFB22E); box-shadow: 0 9px 16px -6px rgba(190,140,40,.5), inset 0 4px 6px rgba(255,255,255,.6), inset 0 -7px 10px rgba(160,110,25,.3); }
+
+    /* 상단 바 */
+    .topbar { display: flex; align-items: center; gap: 10px; padding: 16px 18px; position: sticky; top: 0; background: rgba(255,248,242,.92); backdrop-filter: blur(8px); z-index: 20; border-bottom: 1px solid #F3EAE1; }
+    .topbar .back { width: 40px; height: 40px; border-radius: 13px; background: #fff; border: 1px solid #EFE2D5; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #9A6A3C; }
+    .topbar .back:active { opacity: .6; }
+    .topbar-title { font-family: 'Jua', sans-serif; font-size: 19px; }
+
+    /* 히어로 */
+    .hero { padding: 30px 24px 24px; text-align: center; background: radial-gradient(120% 80% at 50% 0%, #FFEFE0 0%, #FFF8F2 70%); }
+    .hero-title { font-family: 'Jua', sans-serif; font-size: 28px; line-height: 1.25; }
+    .hero-sub { font-size: 15px; color: #8A7868; line-height: 1.7; margin-top: 12px; }
+    .hero-sub b { color: #E8631E; font-weight: 800; }
+
+    /* 탭 (자녀 / 부모님) */
+    .tabs { display: flex; gap: 8px; padding: 6px; margin: 22px 20px 0; background: #FBF1E8; border-radius: 18px; }
+    .tab { flex: 1; border: none; background: transparent; font-family: 'Gothic A1', sans-serif; font-size: 15px; font-weight: 800; color: #B0937C; padding: 12px 0; border-radius: 13px; cursor: pointer; transition: .15s; }
+    .tab.active { background: #fff; color: #E8631E; box-shadow: 0 6px 14px -8px rgba(150,90,50,.5); }
+
+    .panel { display: none; padding: 24px 20px 8px; }
+    .panel.active { display: block; }
+    .panel-intro { font-size: 14px; color: #9A8676; line-height: 1.7; background: #FFF6EF; border: 1.5px solid #FFE2C8; border-radius: 16px; padding: 14px 16px; margin-bottom: 8px; }
+    .panel-intro b { color: #E8631E; }
+
+    /* 스텝 카드 */
+    .step-card { background: #fff; border: 1px solid #F0E4D8; border-radius: 24px; padding: 18px 18px 20px; box-shadow: 0 10px 22px -16px rgba(150,90,50,.45); margin-top: 18px; }
+    .step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .step-num { width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%; background: linear-gradient(180deg,#FF8A3D,#F26A1B); color: #fff; font-family: 'Jua', sans-serif; font-size: 17px; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 12px -5px rgba(230,99,30,.6); }
+    .step-num.soft { background: #FFE6CF; color: #C2571F; box-shadow: none; }
+    .step-title { font-size: 18px; font-weight: 800; }
+    .step-desc { font-size: 15px; color: #6B5A49; line-height: 1.75; }
+    .step-desc b { color: #E8631E; font-weight: 800; }
+    .step-shot { margin-top: 14px; border-radius: 18px; overflow: hidden; border: 1px solid #F0E4D8; background: #F7EFE7; }
+    .step-shot + .step-shot { margin-top: 10px; }
+    .shot-row { display: flex; gap: 10px; margin-top: 14px; }
+    .shot-row .step-shot { flex: 1; margin-top: 0; }
+
+    .tip { display: flex; gap: 8px; font-size: 13.5px; color: #8A7868; line-height: 1.6; background: #FBF3EB; border-radius: 14px; padding: 11px 13px; margin-top: 12px; }
+    .tip.warn { background: #FFF1EC; color: #C2571F; }
+    .tip .ti { flex-shrink: 0; }
+
+    /* 멘트 미리보기 */
+    .memo-script { font-size: 17px; font-weight: 700; line-height: 1.75; white-space: pre-line; background: #FFF6EF; border: 2px solid #FFD9B8; border-radius: 16px; padding: 16px; text-align: center; margin-top: 12px; }
+    .memo-label { font-size: 13px; font-weight: 800; color: #B07A45; margin-top: 14px; }
+
+    /* FAQ */
+    .faq-section { padding: 8px 20px 12px; }
+    .faq-title { font-family: 'Jua', sans-serif; font-size: 22px; margin: 16px 0 4px; text-align: center; }
+    details { background: #fff; border: 1px solid #F0E4D8; border-radius: 18px; padding: 0 16px; margin-top: 12px; box-shadow: 0 8px 18px -14px rgba(150,90,50,.4); }
+    summary { list-style: none; cursor: pointer; padding: 16px 0; font-size: 15.5px; font-weight: 800; color: #4A3B2D; display: flex; align-items: center; gap: 8px; }
+    summary::-webkit-details-marker { display: none; }
+    summary .q { color: #E8631E; }
+    summary .chev { margin-left: auto; transition: .2s; color: #C9B6A3; }
+    details[open] summary .chev { transform: rotate(180deg); }
+    .faq-answer { font-size: 14.5px; color: #6B5A49; line-height: 1.8; padding: 0 0 16px 22px; }
+
+    /* 하단 CTA */
+    .final { padding: 36px 24px 30px; text-align: center; }
+    .final-title { font-family: 'Jua', sans-serif; font-size: 22px; line-height: 1.4; }
+    .btn-primary { display: flex; align-items: center; justify-content: center; gap: 9px; height: 60px; font-size: 20px; font-weight: 900; border-radius: 20px; border: none; background: linear-gradient(180deg,#FF8A3D,#F26A1B); color: #fff; cursor: pointer; box-shadow: 0 14px 24px -10px rgba(230,99,30,.65); margin-top: 18px; }
+    .btn-primary:active { transform: translateY(1px); }
+
+    .footer { padding: 22px 24px 40px; text-align: center; border-top: 1px solid #F3EAE1; }
+    .footer-copy { font-size: 12.5px; color: #B8A795; line-height: 1.7; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 상단 바 -->
+  <div class="topbar">
+    <a class="back" href="intro.html" aria-label="뒤로">←</a>
+    <div class="topbar-title">사용 가이드</div>
+  </div>
+
+  <!-- 히어로 -->
+  <header class="hero">
+    <h1 class="hero-title">처음이어도 괜찮아요</h1>
+    <p class="hero-sub">자녀가 <b>한 번만 등록</b>하면<br>부모님은 링크 하나로 <b>계속 편하게</b> 주문!</p>
+  </header>
+
+  <!-- 탭 -->
+  <div class="tabs">
+    <button class="tab active" data-tab="child">🧑‍💻 자녀 (등록)</button>
+    <button class="tab" data-tab="parent">👵 부모님 (주문)</button>
+  </div>
+
+  <!-- 자녀 패널 -->
+  <section class="panel active" id="panel-child">
+    <p class="panel-intro">자녀(관리자)가 가게·메뉴·주소를 등록한 뒤 <b>링크를 만들어 부모님께 전달</b>해요. 부모님은 그 링크만 열면 <b>로그인 없이</b> 바로 주문할 수 있어요.</p>
+
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">1</div><div class="step-title">접속 & 구글 로그인</div></div>
+      <div class="step-desc">앱을 <b>Safari 또는 Chrome</b>으로 열고 <b>"Google로 시작하기"</b>를 누르세요.</div>
+      <div class="step-shot"><img src="images/01-login.png" alt="로그인 화면"></div>
+      <div class="tip warn"><span class="ti">⚠️</span><span>카카오톡 안에서 링크를 눌렀다면 구글 로그인이 막혀요. 우측 상단 <b>⋯ → 다른 브라우저로 열기</b>로 Safari/Chrome에서 다시 열어주세요.</span></div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">2</div><div class="step-title">가게 추가하기</div></div>
+      <div class="step-desc">로그인하면 <b>단골집 관리</b> 화면이 열려요. <b>"＋ 가게 추가하기"</b>를 누르세요.</div>
+      <div class="step-shot"><img src="images/02-admin-home.png" alt="관리자 홈"></div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">3</div><div class="step-title">가게 정보 입력</div></div>
+      <div class="step-desc">🏠 가게 이름, 📞 전화번호, 🍽 메뉴를 입력해요. 메뉴는 하나씩 입력 후 <b>＋</b>로 추가하고, 다 됐으면 <b>저장하기</b>를 누르세요.</div>
+      <div class="shot-row">
+        <div class="step-shot"><img src="images/03-add-store-empty.png" alt="가게 추가 폼 (빈 상태)"></div>
+        <div class="step-shot"><img src="images/04-add-store-filled.png" alt="가게 추가 폼 (입력 완료)"></div>
+      </div>
+      <div class="tip"><span class="ti">💡</span><span>가게·메뉴 이름에 "치킨", "피자", "죽" 같은 단어가 들어가면 아이콘이 자동으로 바뀌어요.</span></div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">4</div><div class="step-title">우리집 주소 등록 & 링크 공유</div></div>
+      <div class="step-desc">
+        ① <b>"🏠 우리집 주소"</b> 칸에 배달받을 주소를 입력하고 <b>저장</b> (배달 멘트에 자동 포함돼요)<br>
+        ② <b>"📋 링크 복사"</b> 또는 <b>"💬 카톡으로 보내기"</b>로 부모님께 주문 링크를 전달!
+      </div>
+      <div class="step-shot"><img src="images/05-admin-home-full.png" alt="관리자 홈 — 가게 등록 완료"></div>
+      <div class="tip"><span class="ti">🔒</span><span>링크를 받은 분은 주문 화면만 볼 수 있고 수정은 불가능해요. 가게·주소를 바꾸려면 언제든 다시 로그인해서 수정하면 돼요.</span></div>
+    </div>
+  </section>
+
+  <!-- 부모님 패널 -->
+  <section class="panel" id="panel-parent">
+    <p class="panel-intro">자녀에게 받은 <b>링크를 누르면 바로 시작</b>! 회원가입·로그인 필요 없어요.</p>
+
+    <div class="step-card">
+      <div class="step-head"><div class="step-num soft">1</div><div class="step-title">가게 고르기</div></div>
+      <div class="step-desc"><b>"어디서 시킬까요?"</b> 화면에서 원하는 가게를 손가락으로 <b>한 번 톡</b> 누르세요.</div>
+      <div class="step-shot"><img src="images/06-parent-home.png" alt="부모님 가게 목록"></div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-head"><div class="step-num soft">2</div><div class="step-title">메뉴 고르기</div></div>
+      <div class="step-desc"><b>"무엇을 드실까요?"</b> 화면에서 드시고 싶은 메뉴를 누르세요. 여러 개 골라도 되고, 다시 누르면 취소돼요.</div>
+      <div class="step-shot"><img src="images/07-order-menu.png" alt="메뉴 선택 화면"></div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-head"><div class="step-num soft">3</div><div class="step-title">포장 / 배달 고르기</div></div>
+      <div class="step-desc">메뉴 아래에서 받는 방법을 골라요. <b>🛍️ 포장</b>은 직접 찾아올 때, <b>🛵 배달</b>은 집까지 받을 때. 기본은 포장이며, 배달은 눌러서 주황색이 되는지 확인하세요.</div>
+      <div class="shot-row">
+        <div class="step-shot"><img src="images/08-order-selected-pickup.png" alt="포장 선택 상태"></div>
+        <div class="step-shot"><img src="images/09-order-selected-delivery.png" alt="배달 선택 상태"></div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-head"><div class="step-num soft">4</div><div class="step-title">전화 주문하기</div></div>
+      <div class="step-desc">주황색 <b>"📞 전화 주문하기"</b>를 누르면 주문 메모가 나와요. 화면 문장을 그대로 읽으면 되고, <b>"📞 전화 걸기"</b>로 바로 연결!</div>
+      <div class="memo-label">🛍️ 포장 멘트</div>
+      <div class="step-shot"><img src="images/11-memo-pickup.png" alt="주문 메모 — 포장"></div>
+      <div class="memo-label">🛵 배달 멘트 (주소 자동 포함)</div>
+      <div class="step-shot"><img src="images/10-memo-delivery.png" alt="주문 메모 — 배달"></div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <h2 class="faq-title">자주 묻는 질문</h2>
+
+    <details>
+      <summary><span class="q">Q.</span> 카톡에서 부모님 링크를 눌렀는데 화면이 이상해요<span class="chev">⌄</span></summary>
+      <div class="faq-answer">부모님 전용 링크(<code>?fid=...</code>)는 카카오톡 안에서도 정상 동작해요. 만약 로그인 화면이 보인다면 잘못된 링크이니 자녀에게 다시 받아주세요.</div>
+    </details>
+
+    <details>
+      <summary><span class="q">Q.</span> 배달 멘트에 주소가 안 보여요<span class="chev">⌄</span></summary>
+      <div class="faq-answer">자녀가 주소를 입력 후 <b>저장 버튼까지</b> 눌렀는지 확인하고, 부모님 화면을 새로고침하면 반영돼요.</div>
+    </details>
+
+    <details>
+      <summary><span class="q">Q.</span> 가게를 수정하거나 삭제하고 싶어요<span class="chev">⌄</span></summary>
+      <div class="faq-answer">자녀가 관리자 화면(로그인 필요)에서 가게 카드의 <b>✏️ 수정</b> / <b>🗑 삭제</b> 버튼을 누르면 돼요.</div>
+    </details>
+
+    <details>
+      <summary><span class="q">Q.</span> 부모님이 링크를 매번 찾기 번거로워요<span class="chev">⌄</span></summary>
+      <div class="faq-answer">링크를 카카오톡 채팅에 보낸 뒤 메시지를 길게 눌러 <b>"채팅방 고정"</b>이나 즐겨찾기에 등록해두면 바로 접근할 수 있어요.</div>
+    </details>
+  </section>
+
+  <!-- 하단 CTA -->
+  <section class="final">
+    <div class="food-icon food-icon--md icon-orange" style="margin:0 auto 8px;">🍜</div>
+    <h2 class="final-title">이제 직접 해볼까요?</h2>
+    <a class="btn-primary" href="index.html">🍜 앱 시작하기</a>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-copy">단골집 주문 · 부모님을 위한 전화 주문 도우미<br>로그인 없이 링크 하나로, 단골집에 전화 한 통.</div>
+  </footer>
+
+</div>
+
+<script>
+  // 자녀 / 부모님 탭 전환
+  const tabs = document.querySelectorAll('.tab');
+  const panels = { child: document.getElementById('panel-child'), parent: document.getElementById('panel-parent') };
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      Object.values(panels).forEach(function (p) { p.classList.remove('active'); });
+      panels[tab.dataset.tab].classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
