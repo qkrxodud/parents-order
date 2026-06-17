@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>단골집 주문</title>
+  <!-- PWA: 홈 화면 추가 / 앱 아이콘 -->
+  <meta name="theme-color" content="#FF7A1F">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="단골집 주문">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gothic+A1:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -140,6 +148,38 @@
     .memo-script-label { font-size: 15px; color: #9A8676; margin-bottom: 10px; font-weight: 700; }
     .memo-script { font-size: 22px; font-weight: 700; line-height: 1.8; white-space: pre-line; background: #FFF6EF; border: 2px solid #FFD9B8; border-radius: 22px; padding: 22px; }
 
+    /* 부모님 주문 현황 피드 (자녀 홈) */
+    .order-feed { margin: 14px 14px 0; padding: 16px 18px; background: linear-gradient(180deg,#FFF6EC,#FFEEDD); border: 1.5px solid #FFD3A8; border-radius: 22px; box-shadow: 0 8px 18px -12px rgba(230,99,30,.4); }
+    .order-feed-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .order-feed-title { font-family: 'Jua', sans-serif; font-size: 18px; color: #231910; display: flex; align-items: center; gap: 6px; }
+    .notify-toggle { flex-shrink: 0; font-size: 13px; font-weight: 800; padding: 8px 13px; border-radius: 999px; border: 1.5px solid #FFD2AE; background: #fff; color: #E8631E; cursor: pointer; }
+    .order-feed-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #FBE3CB; }
+    .order-feed-item:first-of-type { border-top: none; }
+    .ofi-info { flex: 1; min-width: 0; }
+    .ofi-store { font-weight: 800; font-size: 16px; color: #231910; }
+    .ofi-menus { font-size: 13px; color: #9A8676; margin-top: 2px; word-break: keep-all; }
+    .ofi-time { font-size: 12px; color: #B8A795; flex-shrink: 0; align-self: flex-start; margin-top: 3px; }
+    .ofi-new { display: inline-block; font-size: 11px; font-weight: 800; color: #fff; background: #F26A1B; border-radius: 999px; padding: 2px 7px; margin-left: 6px; vertical-align: middle; }
+
+    /* 홈 화면에 추가 안내 배너 */
+    .install-banner { margin: 16px 18px 0; padding: 16px 18px; background: #FFF3E7; border: 1.5px solid #FBDBB5; border-radius: 22px; display: flex; align-items: center; gap: 13px; box-shadow: 0 8px 18px -12px rgba(230,99,30,.4); }
+    .install-banner .ib-icon { width: 50px; height: 50px; flex-shrink: 0; border-radius: 16px; }
+    .install-banner .ib-text { flex: 1; min-width: 0; }
+    .install-banner .ib-title { font-weight: 800; font-size: 16px; color: #B5651A; line-height: 1.3; }
+    .install-banner .ib-desc { font-size: 13px; color: #8A7868; margin-top: 3px; line-height: 1.5; }
+    .install-banner .ib-btn { flex-shrink: 0; padding: 0 18px; height: 46px; border-radius: 14px; border: none; background: linear-gradient(180deg,#FF8A3D,#F26A1B); color: #fff; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 15px -7px rgba(230,99,30,.6); }
+    .install-banner .ib-close { flex-shrink: 0; width: 30px; height: 30px; border: none; background: none; font-size: 20px; color: #C9B49E; cursor: pointer; padding: 0; align-self: flex-start; }
+
+    /* iOS 홈 화면 추가 안내 시트 */
+    .ios-guide-dim { display: none; position: fixed; inset: 0; background: rgba(35,25,16,.45); z-index: 10000; }
+    .ios-guide-dim.show { display: block; }
+    .ios-guide { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); width: calc(100% - 28px); max-width: 452px; background: #fff; border-radius: 26px; padding: 24px 22px 26px; z-index: 10001; box-shadow: 0 20px 50px -12px rgba(120,70,40,.5); }
+    .ios-guide h3 { font-family: 'Jua', sans-serif; font-size: 21px; margin-bottom: 14px; text-align: center; color: #231910; }
+    .ios-guide .step { display: flex; align-items: center; gap: 12px; padding: 12px 0; font-size: 16px; color: #4A3B2C; line-height: 1.5; }
+    .ios-guide .step .n { width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; background: #FFF1E6; color: #E8631E; font-weight: 900; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+    .ios-guide .share-ic { display: inline-flex; vertical-align: middle; margin: 0 2px; }
+    .ios-guide .ios-close { margin-top: 16px; width: 100%; height: 56px; border-radius: 18px; border: none; background: #FBF1E8; color: #9A6A3C; font-size: 17px; font-weight: 800; cursor: pointer; }
+
     /* 유틸 */
     .empty-hint { text-align: center; padding: 60px 24px; color: #B8A795; font-size: 15px; line-height: 1.8; }
   </style>
@@ -172,6 +212,7 @@
       <span class="topbar-title">단골집 관리</span>
       <button class="logout-btn" onclick="logout()">로그아웃</button>
     </div>
+    <div class="order-feed" id="order-feed" style="display:none;"></div>
     <div class="store-list" id="store-list"></div>
     <button class="add-btn" onclick="showEdit(null)">＋ 가게 추가하기</button>
     <div class="share-panel">
@@ -227,8 +268,29 @@
         <div class="topbar-sub">오늘은 뭐 드실래요?</div>
       </div>
     </div>
+    <div class="install-banner" id="install-banner" style="display:none;">
+      <img class="ib-icon" src="./icons/icon-192.png" alt="앱 아이콘">
+      <div class="ib-text">
+        <div class="ib-title">홈 화면에 추가하세요</div>
+        <div class="ib-desc">한 번만 추가하면 다음부터 바로 열 수 있어요</div>
+      </div>
+      <button class="ib-btn" id="install-btn" onclick="promptInstall()">추가</button>
+      <button class="ib-close" onclick="dismissInstall()" aria-label="닫기">×</button>
+    </div>
     <div class="reorder-section" id="reorder-section" style="display:none;"></div>
     <div class="parent-list" id="parent-list"></div>
+  </div>
+
+  <!-- iOS 홈 화면 추가 안내 시트 -->
+  <div class="ios-guide-dim" id="ios-guide-dim" onclick="closeIosGuide()"></div>
+  <div class="ios-guide" id="ios-guide" style="display:none;">
+    <h3>🍜 홈 화면에 추가하기</h3>
+    <div class="step"><span class="n">1</span><div>화면 아래쪽 <b>공유 버튼</b>
+      <svg class="share-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8631E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M5 12v7a1 1 0 001 1h12a1 1 0 001-1v-7"/></svg>
+      을 눌러주세요</div></div>
+    <div class="step"><span class="n">2</span><div><b>'홈 화면에 추가'</b>를 눌러주세요</div></div>
+    <div class="step"><span class="n">3</span><div>오른쪽 위 <b>'추가'</b>를 누르면 끝!</div></div>
+    <button class="ios-close" onclick="closeIosGuide()">알겠어요</button>
   </div>
 
   <!-- 메뉴 선택 -->
@@ -396,6 +458,9 @@
   let reorderItems = [];
   let familyAddress = '';
   let unsubscribeStores = null;
+  let unsubscribeOrders = null;
+  let ordersBaselineTs = 0;
+  const notifiedOrderIds = new Set();
 
   // ──────────────────────────────
   // 화면 전환
@@ -436,7 +501,97 @@
       || (/Android/i.test(ua) && /; ?wv\)/i.test(ua));
   }
 
-  window.showHome = () => { showScreen('screen-home'); loadStores(); loadAddress(); };
+  // ──────────────────────────────
+  // PWA: 동적 매니페스트 + 서비스워커 + 홈 화면 추가
+  // ──────────────────────────────
+  let deferredInstallPrompt = null;
+  const INSTALL_DISMISS_KEY = 'pwa-install-dismissed';
+
+  function isStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+  function isIos() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent);
+  }
+
+  // 부모님 링크(fid)를 그대로 유지하도록 start_url을 현재 주소로 만든 매니페스트를 동적 생성
+  function setupPwa() {
+    const baseDir = location.href.substring(0, location.href.lastIndexOf('/') + 1);
+    const manifest = {
+      name: '단골집 주문',
+      short_name: '단골집',
+      start_url: location.href,
+      scope: baseDir,
+      display: 'standalone',
+      orientation: 'portrait',
+      background_color: '#FFF8F2',
+      theme_color: '#FF7A1F',
+      lang: 'ko',
+      icons: [
+        { src: new URL('./icons/icon-192.png', location.href).href, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+        { src: new URL('./icons/icon-512.png', location.href).href, sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+      ],
+    };
+    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = URL.createObjectURL(blob);
+    document.head.appendChild(link);
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(e => console.warn('Service worker registration failed', e));
+    }
+  }
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // 안드로이드 크롬: 기본 미니바 대신 우리 배너로 유도
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    maybeShowInstallBanner();
+  });
+  window.addEventListener('appinstalled', () => {
+    document.getElementById('install-banner').style.display = 'none';
+  });
+
+  // 부모님 모드에서만, 아직 설치 안 했고 닫지 않았을 때만 '홈 화면에 추가' 배너 노출
+  function maybeShowInstallBanner() {
+    if (!isParentMode) return;
+    if (isStandalone()) return;
+    if (isInAppBrowser()) return; // 카톡 등 인앱 브라우저는 홈 화면 추가 불가
+    if (localStorage.getItem(INSTALL_DISMISS_KEY) === '1') return;
+    if (deferredInstallPrompt || isIos()) {
+      document.getElementById('install-banner').style.display = 'flex';
+    }
+  }
+
+  window.promptInstall = async () => {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      const { outcome } = await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      if (outcome === 'accepted') document.getElementById('install-banner').style.display = 'none';
+      return;
+    }
+    if (isIos()) openIosGuide();
+  };
+
+  window.dismissInstall = () => {
+    localStorage.setItem(INSTALL_DISMISS_KEY, '1');
+    document.getElementById('install-banner').style.display = 'none';
+  };
+
+  window.openIosGuide = () => {
+    document.getElementById('ios-guide-dim').classList.add('show');
+    document.getElementById('ios-guide').style.display = 'block';
+  };
+  window.closeIosGuide = () => {
+    document.getElementById('ios-guide-dim').classList.remove('show');
+    document.getElementById('ios-guide').style.display = 'none';
+  };
+
+  setupPwa();
+
+  window.showHome = () => { showScreen('screen-home'); loadStores(); loadAddress(); subscribeOrders(); };
   window.showEdit = (storeKey) => {
     editingStoreKey = storeKey;
     document.getElementById('edit-title').textContent = storeKey ? '가게 수정' : '가게 등록';
@@ -481,6 +636,7 @@
 
   window.logout = async () => {
     if (unsubscribeStores) { unsubscribeStores(); unsubscribeStores = null; }
+    if (unsubscribeOrders) { unsubscribeOrders(); unsubscribeOrders = null; }
     await signOut(auth);
     showScreen('screen-login');
   };
@@ -561,6 +717,87 @@
     const address = document.getElementById('f-address').value.trim();
     await set(ref(db, `families/${familyId}/address`), address);
     alert('주소가 저장되었습니다.');
+  };
+
+  // ──────────────────────────────
+  // 부모님 주문 알림 (자녀 홈)
+  // ──────────────────────────────
+  function relativeTime(ts) {
+    const min = Math.floor((Date.now() - ts) / 60000);
+    if (min < 1) return '방금 전';
+    if (min < 60) return `${min}분 전`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr}시간 전`;
+    return `${Math.floor(hr / 24)}일 전`;
+  }
+
+  // 자녀 홈 진입 시 주문 기록을 구독. 구독 시작 이후 들어온 주문만 알림으로 띄운다.
+  function subscribeOrders() {
+    if (unsubscribeOrders) { unsubscribeOrders(); unsubscribeOrders = null; }
+    ordersBaselineTs = Date.now();
+    unsubscribeOrders = onValue(ref(db, `orders/${familyId}`), snap => {
+      const orders = snap.exists() ? snap.val() : {};
+      renderOrderFeed(orders);
+      Object.entries(orders).forEach(([id, o]) => {
+        if (o.ts > ordersBaselineTs && !notifiedOrderIds.has(id)) {
+          notifiedOrderIds.add(id);
+          showOrderNotification(o);
+        }
+      });
+    });
+  }
+
+  function renderOrderFeed(orders) {
+    const el = document.getElementById('order-feed');
+    const entries = Object.entries(orders)
+      .map(([id, o]) => ({ id, ...o }))
+      .sort((a, b) => b.ts - a.ts)
+      .slice(0, 8);
+    if (!entries.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+
+    const canNotify = 'Notification' in window && Notification.permission === 'default';
+    const toggle = canNotify ? `<button class="notify-toggle" onclick="enableOrderNotifications()">🔔 알림 켜기</button>` : '';
+    el.style.display = 'block';
+    el.innerHTML = `
+      <div class="order-feed-head">
+        <div class="order-feed-title">🔔 부모님 주문 현황</div>
+        ${toggle}
+      </div>
+      ${entries.map(o => {
+        const icon = getFoodIcon(o.storeName);
+        const isNew = o.ts > ordersBaselineTs;
+        const typeText = o.orderType === '배달' ? '배달' : '포장';
+        return `
+        <div class="order-feed-item">
+          <div class="food-icon food-icon--sm ${icon.cls}">${icon.emoji}</div>
+          <div class="ofi-info">
+            <div class="ofi-store">${escapeHtml(o.storeName)}${isNew ? '<span class="ofi-new">NEW</span>' : ''}</div>
+            <div class="ofi-menus">${escapeHtml((o.menus || []).join(', '))} · ${typeText}</div>
+          </div>
+          <div class="ofi-time">${relativeTime(o.ts)}</div>
+        </div>`;
+      }).join('')}`;
+  }
+
+  // 브라우저 알림 발송 (앱/탭이 열려 있을 때 동작)
+  function showOrderNotification(o) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const body = `${o.storeName} · ${(o.menus || []).join(', ')} (${o.orderType})`;
+    try {
+      new Notification('🍜 방금 주문하셨어요', { body, icon: './icons/icon-192.png' });
+    } catch (e) {
+      console.warn('Notification failed', e);
+    }
+  }
+
+  window.enableOrderNotifications = async () => {
+    if (!('Notification' in window)) { alert('이 브라우저는 알림을 지원하지 않아요.'); return; }
+    const perm = await Notification.requestPermission();
+    if (perm === 'granted') {
+      new Notification('🔔 알림이 켜졌어요', { body: '부모님이 주문하시면 바로 알려드릴게요.', icon: './icons/icon-192.png' });
+    }
+    const snap = await get(ref(db, `orders/${familyId}`));
+    renderOrderFeed(snap.exists() ? snap.val() : {});
   };
 
   // ──────────────────────────────
@@ -648,6 +885,7 @@
     }).join('');
 
     renderReorders();
+    maybeShowInstallBanner();
   }
 
   // ──────────────────────────────
@@ -827,9 +1065,27 @@
   };
 
   window.callStore = () => {
-    recordOrder();
+    recordOrder();          // 부모님 기기 로컬 이력 (재주문용)
+    notifyChildOfOrder();   // 자녀에게 주문 알림 (Firebase 기록)
     location.href = 'tel:' + currentStoreData.phone.replace(/[^0-9+]/g, '');
   };
+
+  // 부모님이 전화 거는 시점에 주문 1건을 Firebase에 남겨 자녀에게 알린다
+  async function notifyChildOfOrder() {
+    if (!familyId || !currentStoreData || !selectedMenus.length) return;
+    const orderId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    try {
+      await set(ref(db, `orders/${familyId}/${orderId}`), {
+        storeName: currentStoreData.name,
+        menus: [...selectedMenus],
+        orderType: selectedOrderType,
+        ts: Date.now(),
+        seen: false,
+      });
+    } catch (e) {
+      console.warn('Order notify write failed', e);
+    }
+  }
 
   window.backToOrder = () => showScreen('screen-order');
 </script>

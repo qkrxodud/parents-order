@@ -103,13 +103,24 @@ GitHub 콘솔에서:
         ".read": true,
         ".write": "auth != null && auth.uid == $familyId"
       }
+    },
+    "orders": {
+      "$familyId": {
+        ".read": "auth != null && auth.uid == $familyId",
+        ".write": "auth != null && auth.uid == $familyId",
+        "$orderId": {
+          ".write": "!data.exists() && newData.exists()",
+          ".validate": "newData.hasChildren(['storeName','ts'])"
+        }
+      }
     }
   }
 }
 ```
 
-- 읽기: 누구나 가능 (부모님 링크 접근)
-- 쓰기: 로그인한 본인 uid만 가능
+- `families` — 읽기: 누구나(부모님 링크) / 쓰기: 로그인 본인만
+- `orders` — 읽기: 자녀 본인만 / 생성: 누구나(비로그인 부모님 주문 기록), 수정·삭제 불가
+- 주문 알림 기능을 쓰려면 `orders` 규칙을 반드시 배포할 것
 
 ---
 

@@ -84,12 +84,23 @@ Branch: `main` / `/ (root)` 저장. 1~2분 후
         ".read": true,
         ".write": "auth != null && auth.uid == $familyId"
       }
+    },
+    "orders": {
+      "$familyId": {
+        ".read": "auth != null && auth.uid == $familyId",
+        ".write": "auth != null && auth.uid == $familyId",
+        "$orderId": {
+          ".write": "!data.exists() && newData.exists()",
+          ".validate": "newData.hasChildren(['storeName','ts'])"
+        }
+      }
     }
   }
 }
 ```
-- 읽기: 누구나 (부모님 링크 접근)
-- 쓰기: 로그인한 본인 uid만
+- `families` 읽기: 누구나 (부모님 링크 접근) / 쓰기: 로그인한 본인 uid만
+- `orders` 읽기: 본인(자녀)만 (주문 알림 확인) / 생성: 누구나(비로그인 부모님이 주문 기록) — 단 기존 주문 수정·삭제는 불가
+- ⚠️ 부모님은 로그인하지 않으므로, 주문 알림 기능을 쓰려면 위 `orders` 규칙을 **반드시 배포**해야 합니다.
 
 ### 5. 승인된 도메인 추가
 Firebase 콘솔 → Authentication → Settings → 승인된 도메인 →
@@ -101,13 +112,23 @@ Firebase 콘솔 → Authentication → Settings → 승인된 도메인 →
 families/
   {uid}/
     owner: {uid}
+    address: "서울시 ..."          # 배달 주문 시 안내용
     stores/
       {storeKey}/
         name:  "단골 짜장면집"
         phone: "02-1234-5678"
         menus: ["짜장면", "짬뽕", "탕수육"]
+orders/
+  {uid}/
+    {orderId}/                    # 부모님이 전화 주문할 때마다 1건 기록
+      storeName: "단골 짜장면집"
+      menus: ["짜장면"]
+      orderType: "포장"
+      ts: 1718600000000
+      seen: false
 ```
 공유 링크는 `...?fid={uid}` 형태이며, 부모님 화면은 이 `fid`로 해당 가족의 가게를 읽어옵니다.
+부모님이 전화 주문을 하면 `orders/{uid}`에 기록되고, 자녀 홈 화면에서 실시간으로 주문 현황과 알림을 받습니다.
 
 ## Firebase 무료 한도 (Spark 플랜)
 
