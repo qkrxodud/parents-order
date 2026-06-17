@@ -22,6 +22,10 @@
     .screen { display: none; }
     .screen.active { display: block; }
 
+    /* 부모님 모드(?fid=): 첫 페인트부터 로그인 화면을 숨겨 구글 로그인 깜빡임 방지 */
+    html.parent-mode #screen-login { display: none !important; }
+    html.parent-mode #screen-parent { display: block; }
+
     /* 공통 */
     .topbar { display: flex; align-items: center; gap: 12px; padding: 18px 20px; background: #fff; border-bottom: 1px solid #F3EAE1; }
     .topbar-title { font-family: 'Jua', sans-serif; font-size: 21px; color: #231910; flex: 1; line-height: 1.2; }
@@ -107,15 +111,16 @@
     /* 다시 주문하기 (원터치 재주문) */
     .reorder-section { padding: 18px 18px 0; }
     .reorder-heading { font-family: 'Jua', sans-serif; font-size: 20px; margin: 2px 4px 12px; display: flex; align-items: center; gap: 7px; }
-    .reorder-list { display: flex; flex-direction: column; gap: 12px; }
-    .reorder-card { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 14px; width: 100%; background: linear-gradient(180deg,#FFF6EC,#FFEEDD); border: 2px solid #FFD3A8; border-radius: 24px; padding: 15px 16px; box-shadow: 0 8px 18px -12px rgba(230,99,30,.45); font-family: inherit; }
+    .reorder-list { display: flex; flex-direction: column; gap: 10px; }
+    .reorder-card { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 11px; width: 100%; background: linear-gradient(180deg,#FFF6EC,#FFEEDD); border: 2px solid #FFD3A8; border-radius: 20px; padding: 11px 13px; box-shadow: 0 6px 14px -11px rgba(230,99,30,.45); font-family: inherit; }
     .reorder-card:active { transform: translateY(1px); }
+    .reorder-card .food-icon--lg { width: 46px; height: 46px; font-size: 25px; border-radius: 14px; }
     .reorder-info { flex: 1; min-width: 0; }
-    .reorder-store { font-family: 'Jua', sans-serif; font-size: 21px; line-height: 1.15; }
-    .reorder-menus { font-size: 15px; color: #9A8676; margin-top: 3px; word-break: keep-all; }
-    .reorder-badge { display: inline-block; font-size: 13px; font-weight: 800; color: #E8631E; background: #fff; border: 1px solid #FFD2AE; border-radius: 999px; padding: 4px 11px; margin-top: 8px; }
-    .reorder-cta { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #E8631E; font-weight: 900; font-size: 13px; }
-    .reorder-cta .ic { font-size: 27px; line-height: 1; }
+    .reorder-store { font-family: 'Jua', sans-serif; font-size: 18px; line-height: 1.15; }
+    .reorder-menus { font-size: 14px; color: #9A8676; margin-top: 2px; word-break: keep-all; }
+    .reorder-badge { display: inline-block; font-size: 12px; font-weight: 800; color: #E8631E; background: #fff; border: 1px solid #FFD2AE; border-radius: 999px; padding: 3px 9px; margin-top: 5px; }
+    .reorder-cta { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #E8631E; font-weight: 900; font-size: 12px; }
+    .reorder-cta .ic { font-size: 23px; line-height: 1; }
     .reorder-divider { font-size: 14px; font-weight: 800; color: #B8A795; margin: 22px 22px 2px; }
 
     /* 메뉴 선택 */
@@ -185,6 +190,12 @@
   </style>
 </head>
 <body>
+<script>
+  // 부모님 링크(?fid=)면 첫 페인트 전에 표시해, 구글 로그인 화면이 잠깐 보이는 것을 막는다
+  if (new URLSearchParams(location.search).has('fid')) {
+    document.documentElement.classList.add('parent-mode');
+  }
+</script>
 <div class="app">
 
   <!-- 로그인 화면 -->
@@ -278,7 +289,7 @@
       <button class="ib-close" onclick="dismissInstall()" aria-label="닫기">×</button>
     </div>
     <div class="reorder-section" id="reorder-section" style="display:none;"></div>
-    <div class="parent-list" id="parent-list"></div>
+    <div class="parent-list" id="parent-list"><div class="empty-hint">🍜<br>불러오는 중...</div></div>
   </div>
 
   <!-- iOS 홈 화면 추가 안내 시트 -->
@@ -916,29 +927,45 @@
     localStorage.setItem(historyKey(), JSON.stringify(history.slice(0, 50)));
   }
 
-  // 이력을 (가게·메뉴·포장배달) 단위로 묶어 자주+최근 순 상위 3개만 노출
+  // 이력을 가게 단위로 묶어 자주+최근 순 상위 3개 가게만 노출 (가게당 카드 1장)
   function renderReorders() {
     const section = document.getElementById('reorder-section');
-    const groups = new Map();
+    const stores = new Map(); // storeKey → { storeKey, total, ts, combos }
 
     loadHistory().forEach(o => {
       const store = parentStores[o.storeKey];
       if (!store) return; // 삭제된 가게 제외
       const menus = (o.menus || []).filter(m => (store.menus || []).includes(m));
       if (!menus.length) return; // 메뉴가 모두 사라진 주문 제외
-      const sig = `${o.storeKey}|${[...menus].sort().join(',')}|${o.orderType}`;
-      const prev = groups.get(sig);
-      if (prev) {
-        prev.count++;
-        if (o.ts > prev.ts) prev.ts = o.ts;
+
+      let entry = stores.get(o.storeKey);
+      if (!entry) {
+        entry = { storeKey: o.storeKey, total: 0, ts: o.ts, combos: new Map() };
+        stores.set(o.storeKey, entry);
+      }
+      entry.total++;
+      if (o.ts > entry.ts) entry.ts = o.ts;
+
+      // 가게 안에서 (메뉴조합·포장배달) 단위로 대표 메뉴 후보 집계
+      const comboSig = `${[...menus].sort().join(',')}|${o.orderType}`;
+      const combo = entry.combos.get(comboSig);
+      if (combo) {
+        combo.count++;
+        if (o.ts > combo.ts) combo.ts = o.ts;
         return;
       }
-      groups.set(sig, { storeKey: o.storeKey, menus, orderType: o.orderType, count: 1, ts: o.ts });
+      entry.combos.set(comboSig, { menus, orderType: o.orderType, count: 1, ts: o.ts });
     });
 
-    reorderItems = [...groups.values()]
-      .sort((a, b) => b.count - a.count || b.ts - a.ts)
-      .slice(0, 3);
+    // 가게마다 가장 자주+최근 시킨 메뉴조합을 대표 카드로 선정
+    reorderItems = [...stores.values()]
+      .sort((a, b) => b.total - a.total || b.ts - a.ts)
+      .slice(0, 3)
+      .map(entry => {
+        const rep = [...entry.combos.values()]
+          .sort((a, b) => b.count - a.count || b.ts - a.ts)[0];
+        return { storeKey: entry.storeKey, menus: rep.menus, orderType: rep.orderType, count: rep.count, ts: rep.ts };
+      });
 
     if (!reorderItems.length) {
       section.style.display = 'none';
