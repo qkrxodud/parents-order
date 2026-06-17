@@ -22,9 +22,10 @@
     .screen { display: none; }
     .screen.active { display: block; }
 
-    /* 부모님 모드(?fid=): 첫 페인트부터 로그인 화면을 숨겨 구글 로그인 깜빡임 방지 */
-    html.parent-mode #screen-login { display: none !important; }
-    html.parent-mode #screen-parent { display: block; }
+    /* 부모님 모드(?fid=): 첫 페인트부터 로그인 화면을 숨겨 구글 로그인 깜빡임 방지.
+       단, JS가 화면을 한 번이라도 전환하면(.app-ready) .active 시스템이 화면을 제어하도록 양보한다. */
+    html.parent-mode:not(.app-ready) #screen-login { display: none !important; }
+    html.parent-mode:not(.app-ready) #screen-parent { display: block; }
 
     /* 공통 */
     .topbar { display: flex; align-items: center; gap: 12px; padding: 18px 20px; background: #fff; border-bottom: 1px solid #F3EAE1; }
@@ -476,6 +477,8 @@
   // 화면 전환
   // ──────────────────────────────
   function showScreen(id) {
+    // JS가 화면 제어를 시작했음을 표시 → 부모님 모드 첫 페인트 강제 규칙 해제
+    document.documentElement.classList.add('app-ready');
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
   }
